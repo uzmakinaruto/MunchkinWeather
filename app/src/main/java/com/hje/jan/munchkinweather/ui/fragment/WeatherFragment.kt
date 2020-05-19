@@ -1,22 +1,34 @@
 package com.hje.jan.munchkinweather.ui.fragment
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import com.hje.jan.munchkinweather.R
+import com.hje.jan.munchkinweather.extension.dp2px
+import com.hje.jan.munchkinweather.ui.activity.WeatherActivity
 import kotlinx.android.synthetic.main.fragment_weather.*
+import kotlinx.android.synthetic.main.titlebar_weather.*
 
 
 class WeatherFragment private constructor() : Fragment() {
 
     lateinit var name: String
+    var scrollToShowTitleBarDistance = 0
+    lateinit var titleBar: View
+    lateinit var titleBarTempText: TextView
 
     companion object {
+        val SCROLL_TO_TOP = (300 + 16).dp2px()
+        val SCROLL_TO_SHOW_TITLE_BAR_TEMP_TEXT = 50.dp2px()
+
         fun newInstance(bgColor: Int, name: String): WeatherFragment {
             val fragment = WeatherFragment()
             fragment.arguments = Bundle().apply {
@@ -45,7 +57,6 @@ class WeatherFragment private constructor() : Fragment() {
     ): View? {
         Log.d("MunchkinWeather", "onCreateView-${name}")
         val root = inflater.inflate(R.layout.fragment_weather, container, false)
-
         return root
     }
 
@@ -53,6 +64,29 @@ class WeatherFragment private constructor() : Fragment() {
         super.onActivityCreated(savedInstanceState)
         Log.d("MunchkinWeather", "onActivityCreated-${name}")
         tempText.typeface = Typeface.createFromAsset(activity!!.assets, "msyhl.ttc")
+        initTitleBar()
+        scrollView.setOnScrollChangeListener { v: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
+            val isShowTitleBarBg = scrollY.toFloat() / scrollToShowTitleBarDistance >= 1f
+            var scrolled = scrollY.toFloat() / SCROLL_TO_TOP
+            if (scrolled > 1f) scrolled = 1f
+            if (isShowTitleBarBg) titleBar.setBackgroundColor(Color.WHITE)
+            else titleBar.setBackgroundColor(Color.TRANSPARENT)
+            bg.setBackgroundColor((((scrolled * 0xFF).toInt() shl 24) or 0x00FFFFFF))
+            if (scrollToShowTitleBarDistance - scrollY < SCROLL_TO_SHOW_TITLE_BAR_TEMP_TEXT) {
+                var tempAlpha =
+                    1 - 0.8f * (scrollToShowTitleBarDistance - scrollY) / SCROLL_TO_SHOW_TITLE_BAR_TEMP_TEXT
+                if (tempAlpha >= 1f) tempAlpha = 1f
+                titleBarTempText.alpha = tempAlpha
+                titleBarTempText.translationX = 100 - scrolled * 100
+            } else {
+                titleBarTempText.alpha = 0f
+            }
+            Log.d(
+                "MunchkinWeather",
+                "scrollY:${scrollY}  oldScrollY:${oldScrollY} scrolled:${scrolled}}"
+            )
+
+        }
     }
 
     override fun onResume() {
@@ -78,5 +112,13 @@ class WeatherFragment private constructor() : Fragment() {
     override fun onDetach() {
         super.onDetach()
         Log.d("MunchkinWeather", "onDetach-${name}")
+    }
+
+    private fun initTitleBar() {
+        titleBarTempText = (activity as WeatherActivity).titleBarTempText
+        titleBar = (activity as WeatherActivity).titleBar
+        titleBar.viewTreeObserver.addOnGlobalLayoutListener {
+            scrollToShowTitleBarDistance = SCROLL_TO_TOP - titleBar.height
+        }
     }
 }

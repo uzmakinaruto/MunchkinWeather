@@ -12,11 +12,13 @@ import com.hje.jan.munchkinweather.ui.adapter.WeatherViewPagerAdapter
 import com.hje.jan.munchkinweather.ui.fragment.WeatherFragment
 import com.hje.jan.munchkinweather.util.WindowUtil
 import kotlinx.android.synthetic.main.activity_weather.*
+import kotlinx.android.synthetic.main.titlebar_weather.*
 
 class WeatherActivity : AppCompatActivity() {
 
     private val fragments = mutableListOf<WeatherFragment>()
     private val names = listOf<String>("Fragment1", "Fragment2", "Fragment3")
+    private var titleHeight = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
@@ -24,6 +26,7 @@ class WeatherActivity : AppCompatActivity() {
         initViewPager()
         initVideoView()
     }
+
 
     private fun initViewPager() {
         for (element in names) {
@@ -40,7 +43,6 @@ class WeatherActivity : AppCompatActivity() {
                 positionOffset: Float,
                 positionOffsetPixels: Int
             ) {
-
                 viewPager.setBackgroundColor((((positionOffset * 0xFF).toInt() shl 24) or 0x00FFFFFF))
                 Log.d(
                     "onPageScrolled",
