@@ -2,8 +2,10 @@ package com.hje.jan.munchkinweather.logic.network
 
 import com.hje.jan.munchkinweather.MunchkinWeatherApplication
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
+import com.hje.jan.munchkinweather.logic.model.RealtimeResponse
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface PlaceService {

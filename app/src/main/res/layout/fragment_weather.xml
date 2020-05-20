@@ -35,9 +35,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@id/tempText"
-                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginBottom="18dp"
-                android:layout_toRightOf="@id/tempText"
+                android:layout_toEndOf="@id/tempText"
                 android:orientation="vertical">
 
                 <TextView

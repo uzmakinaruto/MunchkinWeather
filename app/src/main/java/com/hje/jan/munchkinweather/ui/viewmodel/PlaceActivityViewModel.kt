@@ -4,9 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.hje.jan.munchkinweather.logic.Repository
-import com.hje.jan.munchkinweather.logic.model.Place
+import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 
-class PlaceViewModel : ViewModel() {
+class PlaceActivityViewModel : ViewModel() {
 
     private val searchPlace = MutableLiveData<String>()
 
@@ -15,7 +15,7 @@ class PlaceViewModel : ViewModel() {
     }
 
 
-    val foundedPlaces = mutableListOf<Place>()
+    val foundedPlaces = mutableListOf<PlaceResponse.Place>()
 
     fun searchPlace(query: String) {
         searchPlace.value = query

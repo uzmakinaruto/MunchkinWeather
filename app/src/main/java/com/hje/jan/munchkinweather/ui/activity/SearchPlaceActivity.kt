@@ -7,17 +7,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hje.jan.munchkinweather.R
-import com.hje.jan.munchkinweather.logic.model.Place
+import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 import com.hje.jan.munchkinweather.ui.adapter.SearchPlaceAdapter
 import com.hje.jan.munchkinweather.ui.adapter.SearchTextChangeAdapter
-import com.hje.jan.munchkinweather.ui.viewmodel.PlaceViewModel
+import com.hje.jan.munchkinweather.ui.viewmodel.PlaceActivityViewModel
 import com.hje.jan.munchkinweather.util.WindowUtil
 import kotlinx.android.synthetic.main.activity_search_place.*
 import kotlinx.android.synthetic.main.titlebar_search.*
+import org.jetbrains.anko.startActivity
 
 class SearchPlaceActivity : AppCompatActivity() {
 
-    private val viewModel by lazy { PlaceViewModel() }
+    private val viewModel by lazy { PlaceActivityViewModel() }
     lateinit var adapter: SearchPlaceAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,9 +67,12 @@ class SearchPlaceActivity : AppCompatActivity() {
         adapter = SearchPlaceAdapter(viewModel.foundedPlaces)
         recyclerview.adapter = adapter
         recyclerview.layoutManager = LinearLayoutManager(this)
+        adapter.onClickListener = {
+            startActivity<WeatherActivity>("place" to it)
+        }
     }
 
-    private fun refreshList(places: List<Place>) {
+    private fun refreshList(places: List<PlaceResponse.Place>) {
         viewModel.foundedPlaces.clear()
         viewModel.foundedPlaces.addAll(places)
         adapter.notifyDataSetChanged()

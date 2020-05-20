@@ -1,7 +1,5 @@
 package com.hje.jan.munchkinweather.logic.network
 
-import android.util.Log
-import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -11,22 +9,19 @@ import kotlin.coroutines.suspendCoroutine
 
 object MunchkinWeatherNetwork {
 
-    private val placeService = ServiceCreator.create(PlaceService::class.java)
+    private val placeService = ServiceCreator.create<PlaceService>()
+    private val weatherService = ServiceCreator.create<WeatherService>()
 
     suspend fun searchPlace(query: String) = placeService.searchPlace(query).await()
 
-    /*fun searchPlace(query: String) {
-        placeService.searchPlace(query).enqueue(object : Callback<PlaceResponse> {
-            override fun onFailure(call: Call<PlaceResponse>, t: Throwable) {
-                Log.d("onFailure", t.message)
-            }
+    suspend fun getRealtimeResponse(lng: String, lat: String) =
+        weatherService.getRealtimeResponse(lng, lat).await()
 
-            override fun onResponse(call: Call<PlaceResponse>, response: Response<PlaceResponse>) {
-                Log.d("onResponse", response.body().toString())
-            }
+    suspend fun getDailyResponse(lng: String, lat: String) =
+        weatherService.getDailyResponse(lng, lat).await()
 
-        })
-    }*/
+    suspend fun getHourlyResponse(lng: String, lat: String) =
+        weatherService.getHourlyResponse(lng, lat).await()
 
     private suspend fun <T> Call<T>.await(): T {
         return suspendCoroutine { continuation ->

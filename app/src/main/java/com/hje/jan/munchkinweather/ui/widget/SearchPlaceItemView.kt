@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.RelativeLayout
 import com.hje.jan.munchkinweather.R
-import com.hje.jan.munchkinweather.logic.model.Place
+import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 import kotlinx.android.synthetic.main.item_search_place.view.*
 
 class SearchPlaceItemView : RelativeLayout {
@@ -21,7 +21,7 @@ class SearchPlaceItemView : RelativeLayout {
         View.inflate(context, R.layout.item_search_place, this)
     }
 
-    fun bindView(place: Place) {
+    fun bindView(place: PlaceResponse.Place) {
         name.text = place.name
         formattedAddress.text = place.formattedAddress
     }
