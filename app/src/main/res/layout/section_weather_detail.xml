@@ -26,16 +26,30 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2级" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2"
+                    android:textColor="#e0620d" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="级"
+                    android:textColor="#e0620d"
+                    android:textSize="8sp" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="东南风" />
+                android:text="东南风"
+                android:textColor="#e0620d" />
         </LinearLayout>
 
         <LinearLayout
@@ -45,16 +59,30 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="78%" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="78"
+                    android:textColor="#3f81c1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="%"
+                    android:textColor="#3f81c1"
+                    android:textSize="8dp" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="空气湿度" />
+                android:text="空气湿度"
+                android:textColor="#3f81c1" />
         </LinearLayout>
 
         <LinearLayout
@@ -64,16 +92,31 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="30℃" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="30"
+                    android:textColor="#2aa515" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="℃"
+                    android:textColor="#2aa515"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="体感温度" />
+                android:text="体感温度"
+                android:textColor="#2aa515" />
         </LinearLayout>
 
         <LinearLayout
@@ -83,16 +126,31 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="995hPa" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="995"
+                    android:textColor="#17abe3" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="hPa"
+                    android:textColor="#17abe3"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="气体压强" />
+                android:text="气体压强"
+                android:textColor="#17abe3" />
         </LinearLayout>
     </LinearLayout>
 
@@ -136,7 +194,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="星期四" />
+                android:text="星期四"
+                android:textColor="#707070"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -166,7 +226,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="热" />
+                android:text="热"
+                android:textColor="#707070"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -196,7 +258,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="最弱" />
+                android:text="最弱"
+                android:textColor="#707070"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -226,7 +290,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="凉爽" />
+                android:text="凉爽"
+                android:textColor="#707070"
+                android:textSize="12sp" />
         </LinearLayout>
 
     </LinearLayout>
@@ -262,7 +328,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="易感发" />
+                android:text="易感发"
+                android:textColor="#707070"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -291,7 +359,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="不宜" />
+                android:text="不宜"
+                android:textColor="#707070"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -321,7 +391,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="最弱" />
+                android:text="最弱"
+                android:textColor="#707070"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -353,7 +425,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="推荐" />
+                android:text="推荐"
+                android:textColor="#707070"
+                android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 

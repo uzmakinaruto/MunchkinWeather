@@ -27,12 +27,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="多云"
-        android:textSize="8sp" />
+        android:textSize="10sp" />
 
     <TextView
         android:id="@+id/timeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="12:00"
-        android:textSize="8sp" />
+        android:textSize="10sp" />
 </LinearLayout>

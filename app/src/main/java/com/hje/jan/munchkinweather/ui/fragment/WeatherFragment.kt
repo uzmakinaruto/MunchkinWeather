@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -37,6 +38,7 @@ class WeatherFragment : Fragment() {
     lateinit var hourlyAdapter: HourlyAdapter
     lateinit var dailyAdapter: DailyAdapter
     private val viewModel by lazy { ViewModelProvider(this).get(WeatherFragmentViewModel::class.java) }
+
     companion object {
         val SCROLL_TO_TOP = (300 + 16).dp2px()
         fun newInstance(place: PlaceResponse.Place): WeatherFragment {
@@ -153,6 +155,14 @@ class WeatherFragment : Fragment() {
         dailyRV.layoutManager = LinearLayoutManager(context)
         dailyRV.adapter = dailyAdapter
         viewModel.refreshWeather(place.location.lng, place.location.lat)
+        aqiLayout.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                aqiLayout.alpha = 0.5f
+            } else if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
+                aqiLayout.alpha = 1f
+            }
+            true
+        }
     }
 
     private fun refreshWeatherUI(weatherResponse: WeatherResponse) {
