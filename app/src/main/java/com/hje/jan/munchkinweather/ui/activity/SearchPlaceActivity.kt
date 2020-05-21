@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
@@ -18,7 +19,11 @@ import org.jetbrains.anko.startActivity
 
 class SearchPlaceActivity : AppCompatActivity() {
 
-    private val viewModel by lazy { PlaceActivityViewModel() }
+    private val viewModel by lazy {
+        ViewModelProvider(this).get(
+            PlaceActivityViewModel::class.java
+        )
+    }
     lateinit var adapter: SearchPlaceAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

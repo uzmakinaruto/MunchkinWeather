@@ -27,6 +27,7 @@ data class HourlyResponse(
         val precipitation: List<Precipitation>,
         /**气压*/
         val pressure: List<Pressure>,
+        /**天气状态*/
         @SerializedName("skycon") val skyCon: List<Skycon>,
         /**状态*/
         val status: String,

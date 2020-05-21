@@ -17,8 +17,8 @@ object MunchkinWeatherNetwork {
     suspend fun getRealtimeResponse(lng: String, lat: String) =
         weatherService.getRealtimeResponse(lng, lat).await()
 
-    suspend fun getDailyResponse(lng: String, lat: String) =
-        weatherService.getDailyResponse(lng, lat).await()
+    suspend fun getDailyResponse(lng: String, lat: String, requestDay: Int) =
+        weatherService.getDailyResponse(lng, lat, requestDay).await()
 
     suspend fun getHourlyResponse(lng: String, lat: String) =
         weatherService.getHourlyResponse(lng, lat).await()

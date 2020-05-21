@@ -8,6 +8,7 @@ import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 
 class PlaceActivityViewModel : ViewModel() {
 
+
     private val searchPlace = MutableLiveData<String>()
 
     val places = Transformations.switchMap(searchPlace) { query ->

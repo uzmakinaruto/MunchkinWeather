@@ -28,7 +28,7 @@ object Repository {
             /**这里会并发执行*/
             try {
                 val realtime = async { MunchkinWeatherNetwork.getRealtimeResponse(lng, lat) }
-                val daily = async { MunchkinWeatherNetwork.getDailyResponse(lng, lat) }
+                val daily = async { MunchkinWeatherNetwork.getDailyResponse(lng, lat, 5) }
                 val hourly = async { MunchkinWeatherNetwork.getHourlyResponse(lng, lat) }
                 /**这里会等待请求结果*/
                 val realtimeResponse = realtime.await()

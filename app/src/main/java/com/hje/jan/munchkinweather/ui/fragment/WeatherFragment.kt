@@ -12,23 +12,31 @@ import android.widget.TextView
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.extension.dp2px
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
+import com.hje.jan.munchkinweather.logic.model.WeatherResponse
 import com.hje.jan.munchkinweather.ui.activity.WeatherActivity
+import com.hje.jan.munchkinweather.ui.adapter.DailyAdapter
+import com.hje.jan.munchkinweather.ui.adapter.HourlyAdapter
 import com.hje.jan.munchkinweather.ui.viewmodel.WeatherFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_weather.*
+import kotlinx.android.synthetic.main.section_weather_forecast.*
 import kotlinx.android.synthetic.main.titlebar_weather.*
 import org.jetbrains.anko.support.v4.toast
 
 
-class WeatherFragment private constructor() : Fragment() {
-
+class WeatherFragment : Fragment() {
     lateinit var place: PlaceResponse.Place
     var scrollToShowTitleBarDistance = 0
     lateinit var titleBar: View
     lateinit var titleBarTempText: TextView
-    private val viewModel by lazy { WeatherFragmentViewModel() }
+    lateinit var hourlyAdapter: HourlyAdapter
+    lateinit var dailyAdapter: DailyAdapter
+    private val viewModel by lazy { ViewModelProvider(this).get(WeatherFragmentViewModel::class.java) }
     companion object {
         val SCROLL_TO_TOP = (300 + 16).dp2px()
         fun newInstance(place: PlaceResponse.Place): WeatherFragment {
@@ -63,23 +71,7 @@ class WeatherFragment private constructor() : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         Log.d("MunchkinWeather", "onActivityCreated-${place.name}")
-        /**默认字体太粗 换一个字体*/
-        tempText.typeface = Typeface.createFromAsset(activity!!.assets, "msyhl.ttc")
-        initTitleBar()
-        scrollView.setOnScrollChangeListener { _: NestedScrollView?, _: Int, scrollY: Int, _: Int, _: Int ->
-            scrollHandler(scrollY)
-        }
-        viewModel.weatherLiveData.observe(this, Observer { result ->
-            val weatherResponse = result.getOrNull()
-            if (null != weatherResponse) {
-                Log.d("weatherResponse", weatherResponse.realtime.toString())
-                Log.d("weatherResponse", weatherResponse.daily.toString())
-                Log.d("weatherResponse", weatherResponse.hourly.toString())
-            } else {
-                toast(result.exceptionOrNull()?.localizedMessage ?: "Unknown Exception")
-            }
-        })
-        viewModel.refreshWeather(place.location.lng, place.location.lat)
+        weatherUiInit()
     }
 
     override fun onResume() {
@@ -131,5 +123,41 @@ class WeatherFragment private constructor() : Fragment() {
         } else {
             titleBarTempText.alpha = 0f
         }
+    }
+
+    private fun weatherUiInit() {
+        /**默认字体太粗 换一个字体*/
+        tempText.typeface = Typeface.createFromAsset(activity!!.assets, "msyhl.ttc")
+        initTitleBar()
+        scrollView.setOnScrollChangeListener { _: NestedScrollView?, _: Int, scrollY: Int, _: Int, _: Int ->
+            scrollHandler(scrollY)
+        }
+        viewModel.weatherLiveData.observe(viewLifecycleOwner, Observer { result ->
+            val weatherResponse = result.getOrNull()
+            if (null != weatherResponse) {
+                //Log.d("weatherResponse", weatherResponse.realtime.toString())
+                //Log.d("weatherResponse", weatherResponse.daily.toString())
+                Log.d("weatherResponse", weatherResponse.hourly.toString())
+                viewModel.dailyResult = weatherResponse.daily
+                viewModel.hourResult = weatherResponse.hourly
+                refreshWeatherUI(weatherResponse)
+            } else {
+                toast(result.exceptionOrNull()?.localizedMessage ?: "Unknown Exception")
+            }
+        })
+        hourlyAdapter = HourlyAdapter(viewModel.hourResult)
+        hourlyRV.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+        hourlyRV.adapter = hourlyAdapter
+
+        dailyAdapter = DailyAdapter(viewModel.dailyResult)
+        dailyRV.layoutManager = LinearLayoutManager(context)
+        dailyRV.adapter = dailyAdapter
+        viewModel.refreshWeather(place.location.lng, place.location.lat)
+    }
+
+    private fun refreshWeatherUI(weatherResponse: WeatherResponse) {
+        tempText.text = weatherResponse.realtime.temperature.toInt().toString()
+        viewModel.hourResult?.let { hourlyAdapter.refresh(it) }
+        viewModel.dailyResult?.let { dailyAdapter.refresh(it) }
     }
 }

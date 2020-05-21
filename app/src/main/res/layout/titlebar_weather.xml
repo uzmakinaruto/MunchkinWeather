@@ -25,11 +25,11 @@
 
             <TextView
                 android:id="@+id/locationText"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="东莞市"
                 android:ellipsize="end"
+                android:maxWidth="200dp"
                 android:singleLine="true"
                 android:textColor="@android:color/black"
                 android:textSize="20sp" />

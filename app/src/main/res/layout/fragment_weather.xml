@@ -43,8 +43,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="阴｜良 83 >"
-                    android:textSize="16sp" />
+                    android:text="阴｜良 83"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -55,10 +56,13 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <ImageView
+        <include layout="@layout/section_weather_forecast" />
+
+        <View
             android:layout_width="match_parent"
-            android:layout_height="1080dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/bg_launcher" />
+            android:layout_height="5dp"
+            android:background="@color/divider" />
+
+        <include layout="@layout/section_weather_detail" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
