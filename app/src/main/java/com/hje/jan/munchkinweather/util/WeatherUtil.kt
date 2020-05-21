@@ -1,6 +1,7 @@
 package com.hje.jan.munchkinweather.util
 
 import com.hje.jan.munchkinweather.R
+import java.util.*
 
 /***
  *
@@ -133,6 +134,25 @@ object WeatherUtil {
             "SAND" -> R.drawable.ic_week_dust_storm
             "WIND" -> R.drawable.ic_week_cloudy
             else -> throw RuntimeException("Unknown skyCon")
+        }
+    }
+
+    fun getWeekString(position: Int): String {
+        val calendar = Calendar.getInstance()
+        val dayOfWeek = (calendar.get(Calendar.DAY_OF_WEEK) + position) % 7
+        return when (position) {
+            0 -> "今天"
+            1 -> "明天"
+            else -> when (dayOfWeek) {
+                1 -> "周日"
+                2 -> "周一"
+                3 -> "周二"
+                4 -> "周三"
+                5 -> "周四"
+                6 -> "周五"
+                0 -> "周六"
+                else -> throw RuntimeException("Unknown weekday")
+            }
         }
     }
 }

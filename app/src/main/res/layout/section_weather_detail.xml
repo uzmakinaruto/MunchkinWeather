@@ -363,7 +363,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="32dp"
-        android:text="天气信息由彩云天气提供"
+        android:text="彩云天气 技术支持"
         android:textColor="@color/divider"
         android:textSize="12dp" />
 </LinearLayout>

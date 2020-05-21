@@ -156,7 +156,9 @@ class WeatherFragment : Fragment() {
     }
 
     private fun refreshWeatherUI(weatherResponse: WeatherResponse) {
+        bg.visibility = View.VISIBLE
         tempText.text = weatherResponse.realtime.temperature.toInt().toString()
+        titleBarTempText.text = "${weatherResponse.realtime.temperature.toInt()}°"
         viewModel.hourResult?.let { hourlyAdapter.refresh(it) }
         viewModel.dailyResult?.let { dailyAdapter.refresh(it) }
     }
