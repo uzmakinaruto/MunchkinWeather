@@ -123,6 +123,7 @@ class WeatherFragment : Fragment() {
         if (isShowTitleBarBg) titleBar.setBackgroundColor(Color.WHITE)
         else titleBar.setBackgroundColor(Color.TRANSPARENT)
         bg.setBackgroundColor((((diff1 * 0xFF).toInt() shl 24) or 0x00FFFFFF))
+        videoView.translationY = -scrollY.toFloat()/2
         if (scrollY > scrollToShowTitleBarDistance) {
             val diff2 = scrollY - (SCROLL_TO_TOP - titleBar.height)
             var tempPercentage = diff2.toFloat() / titleBar.height

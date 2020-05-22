@@ -20,6 +20,7 @@
         </activity>
         <activity android:name=".ui.activity.MainActivity" />
         <activity android:name=".ui.activity.WeatherActivity" />
+        <activity android:name=".ui.activity.ManagerLocationActivity" />
     </application>
 
 </manifest>

@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingLeft="8dp"
@@ -12,8 +11,8 @@
 
     <ImageButton
         android:id="@+id/backBtn"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
         android:src="@drawable/selector_back" />
@@ -25,12 +24,13 @@
         android:background="@drawable/shape_search_edittext_bg"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="4dp">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:background="@android:color/transparent"
+            android:layout_marginLeft="4dp"
             android:src="@drawable/ic_search" />
 
         <EditText
@@ -47,10 +47,11 @@
 
         <ImageButton
             android:id="@+id/cancelBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
+            android:layout_marginRight="4dp"
             android:src="@drawable/selector_cancel" />
     </LinearLayout>
 </LinearLayout>
