@@ -161,10 +161,10 @@ data class DailyResponse(
 
     data class Pm25(
         /**PM25，最大值，平均值，最小值*/
-        val avg: Double,
+        val avg: Float,
         val date: String,
-        val max: Int,
-        val min: Int
+        val max: Float,
+        val min: Float
     )
 
     data class Avg(
@@ -173,13 +173,13 @@ data class DailyResponse(
     )
 
     data class Max(
-        val chn: Int,
-        val usa: Int
+        val chn: Double,
+        val usa: Double
     )
 
     data class Min(
-        val chn: Int,
-        val usa: Int
+        val chn: Double,
+        val usa: Double
     )
 
     data class Sunrise(

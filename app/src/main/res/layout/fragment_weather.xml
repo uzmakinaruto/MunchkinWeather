@@ -90,7 +90,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="比昨天高2°C"
                     android:textSize="10sp"
                     android:textColor="#707070"/>
             </LinearLayout>

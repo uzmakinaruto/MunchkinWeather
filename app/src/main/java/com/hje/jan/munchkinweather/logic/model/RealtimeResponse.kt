@@ -52,7 +52,7 @@ data class RealtimeResponse(
         /**臭氧，质量浓度值*/
         val o3: Float,
         /**pm10，质量浓度值*/
-        val pm10: Int,
+        val pm10: Float,
         /**pm25，质量浓度值*/
         val pm25: Float,
         /**二氧化硫，质量浓度值*/

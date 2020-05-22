@@ -29,6 +29,7 @@
         android:paddingStart="16dp"
         android:paddingTop="12dp"
         android:paddingEnd="16dp"
+        android:background="@drawable/selector_bg_divider"
         android:paddingBottom="12dp">
 
         <TextView

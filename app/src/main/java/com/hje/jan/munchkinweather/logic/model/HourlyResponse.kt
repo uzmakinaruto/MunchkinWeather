@@ -97,7 +97,7 @@ data class HourlyResponse(
 
     data class Pm25(
         val datetime: String,
-        val value: Int
+        val value: Float
     )
 
     data class Value(

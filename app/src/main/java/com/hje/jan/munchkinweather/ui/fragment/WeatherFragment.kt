@@ -3,6 +3,7 @@ package com.hje.jan.munchkinweather.ui.fragment
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.VideoView
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -19,15 +21,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.extension.dp2px
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
-import com.hje.jan.munchkinweather.logic.model.WeatherResponse
 import com.hje.jan.munchkinweather.ui.activity.WeatherActivity
 import com.hje.jan.munchkinweather.ui.adapter.DailyAdapter
 import com.hje.jan.munchkinweather.ui.adapter.HourlyAdapter
 import com.hje.jan.munchkinweather.ui.viewmodel.WeatherFragmentViewModel
+import com.hje.jan.munchkinweather.util.WeatherUtil
+import kotlinx.android.synthetic.main.activity_weather.*
 import kotlinx.android.synthetic.main.fragment_weather.*
+import kotlinx.android.synthetic.main.section_weather_detail.*
 import kotlinx.android.synthetic.main.section_weather_forecast.*
 import kotlinx.android.synthetic.main.titlebar_weather.*
 import org.jetbrains.anko.support.v4.toast
+import java.util.*
 
 
 class WeatherFragment : Fragment() {
@@ -35,6 +40,7 @@ class WeatherFragment : Fragment() {
     var scrollToShowTitleBarDistance = 0
     lateinit var titleBar: View
     lateinit var titleBarTempText: TextView
+    lateinit var videoView: VideoView
     lateinit var hourlyAdapter: HourlyAdapter
     lateinit var dailyAdapter: DailyAdapter
     private val viewModel by lazy { ViewModelProvider(this).get(WeatherFragmentViewModel::class.java) }
@@ -101,12 +107,13 @@ class WeatherFragment : Fragment() {
         Log.d("MunchkinWeather", "onDetach-${place.name}")
     }
 
-    private fun initTitleBar() {
+    private fun initActivityView() {
         titleBarTempText = (activity as WeatherActivity).titleBarTempText
         titleBar = (activity as WeatherActivity).titleBar
         titleBar.viewTreeObserver.addOnGlobalLayoutListener {
             scrollToShowTitleBarDistance = SCROLL_TO_TOP - titleBar.height
         }
+        videoView = (activity as WeatherActivity).videoView
     }
 
     private fun scrollHandler(scrollY: Int) {
@@ -130,7 +137,7 @@ class WeatherFragment : Fragment() {
     private fun weatherUiInit() {
         /**默认字体太粗 换一个字体*/
         tempText.typeface = Typeface.createFromAsset(activity!!.assets, "msyhl.ttc")
-        initTitleBar()
+        initActivityView()
         scrollView.setOnScrollChangeListener { _: NestedScrollView?, _: Int, scrollY: Int, _: Int, _: Int ->
             scrollHandler(scrollY)
         }
@@ -142,7 +149,8 @@ class WeatherFragment : Fragment() {
                 Log.d("weatherResponse", weatherResponse.hourly.toString())
                 viewModel.dailyResult = weatherResponse.daily
                 viewModel.hourResult = weatherResponse.hourly
-                refreshWeatherUI(weatherResponse)
+                viewModel.realtimeResult = weatherResponse.realtime
+                refreshWeatherUI()
             } else {
                 toast(result.exceptionOrNull()?.localizedMessage ?: "Unknown Exception")
             }
@@ -165,11 +173,47 @@ class WeatherFragment : Fragment() {
         }
     }
 
-    private fun refreshWeatherUI(weatherResponse: WeatherResponse) {
-        bg.visibility = View.VISIBLE
-        tempText.text = weatherResponse.realtime.temperature.toInt().toString()
-        titleBarTempText.text = "${weatherResponse.realtime.temperature.toInt()}°"
-        viewModel.hourResult?.let { hourlyAdapter.refresh(it) }
-        viewModel.dailyResult?.let { dailyAdapter.refresh(it) }
+    private fun refreshWeatherUI() {
+        viewModel.hourResult?.let {
+            hourlyAdapter.refresh(it)
+            weatherDesc.text = it.description
+        }
+        viewModel.dailyResult?.let {
+            dailyAdapter.refresh(it)
+            clothesIndex.text = it.life_index.dressing[0].desc
+            getColdIndex.text = it.life_index.coldRisk[0].desc
+            washCarIndex.text = it.life_index.carWashing[0].desc
+        }
+        viewModel.realtimeResult?.let {
+            bg.visibility = View.VISIBLE
+            titleBarTempText.text = "${it.temperature.toInt()}°"
+            skyConText.text = WeatherUtil.getSkyConDescription(it.skycon)
+            tempText.text = it.temperature.toInt().toString()
+            aqiStatus.text = it.airQuality.description.chn
+            aqiValue.text = it.airQuality.aqi.chn.toString()
+            windLevel.text = WeatherUtil.getWindLevel(it.wind.speed).toString()
+            windDirection.text = WeatherUtil.getWindDirectionString(it.wind.direction)
+            humidity.text = (it.humidity * 100).toString()
+            apparentTemp.text = it.apparentTemperature.toInt().toString()
+            pressure.text = (it.pressure / 100).toInt().toString()
+            dayText.text = Calendar.getInstance().get(Calendar.DAY_OF_MONTH).toString()
+            dateText.text =
+                "${Calendar.getInstance().get(Calendar.MONTH) + 1}月${Calendar.getInstance().get(
+                    Calendar.DAY_OF_MONTH
+                )}日"
+            dayOfWeekText.text =
+                WeatherUtil.getDayOfWeek(Calendar.getInstance().get(Calendar.DAY_OF_WEEK))
+            ultravioletIndex.text = it.lifeIndex.ultraviolet.desc
+            comfortIndex.text = it.lifeIndex.comfort.desc
+            visibilityIndex.text = "${it.visibility.toInt()}公里"
+            videoView.setVideoURI(
+                Uri.parse(
+                    "android.resource://${activity!!.packageName}/${WeatherUtil.getVideoNameBySkyCon(
+                        it.skycon
+                    )}"
+                )
+            )
+            videoView.start()
+        }
     }
 }

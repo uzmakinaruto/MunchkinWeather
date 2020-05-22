@@ -62,7 +62,7 @@ class WeatherActivity : AppCompatActivity() {
 
     /**为了防止VideoView播放前显示黑色背景 需要在xml设置videoView背景为非透明色*/
     private fun initVideoView() {
-        videoView.setVideoURI(Uri.parse("android.resource://${packageName}/${R.raw.sun}"))
+
         videoView.setOnCompletionListener {
             videoView.start()
         }

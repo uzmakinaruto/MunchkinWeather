@@ -5,6 +5,7 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/weatherDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -31,6 +32,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/windLevel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2"
@@ -45,6 +47,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/windDirection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -64,6 +67,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/humidity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="78"
@@ -81,7 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="空气湿度"
+                android:text="相对湿度"
                 android:textColor="#3f81c1" />
         </LinearLayout>
 
@@ -97,6 +101,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/apparentTemp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="30"
@@ -131,6 +136,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/pressure"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="995"
@@ -174,6 +180,7 @@
 
 
             <TextView
+                android:id="@+id/dayText"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
@@ -184,6 +191,7 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:id="@+id/dateText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -191,6 +199,7 @@
                 android:textColor="@android:color/black" />
 
             <TextView
+                android:id="@+id/dayOfWeekText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -223,6 +232,7 @@
                 android:textColor="@android:color/black" />
 
             <TextView
+                android:id="@+id/clothesIndex"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -255,6 +265,7 @@
                 android:textColor="@android:color/black" />
 
             <TextView
+                android:id="@+id/ultravioletIndex"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -287,6 +298,7 @@
                 android:textColor="@android:color/black" />
 
             <TextView
+                android:id="@+id/comfortIndex"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -325,6 +337,7 @@
                 android:textColor="@android:color/black" />
 
             <TextView
+                android:id="@+id/getColdIndex"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -356,6 +369,7 @@
                 android:textColor="@android:color/black" />
 
             <TextView
+                android:id="@+id/washCarIndex"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -388,6 +402,7 @@
                 android:textColor="@android:color/black" />
 
             <TextView
+                android:id="@+id/visibilityIndex"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
