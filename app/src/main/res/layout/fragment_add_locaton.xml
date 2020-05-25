@@ -2,10 +2,55 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <include layout="@layout/titlebar_search" />
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:navigationIcon="@drawable/ic_back">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/shape_search_edittext_bg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginLeft="4dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_search" />
+
+            <EditText
+                android:id="@+id/searchContent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="搜索城市"
+                android:singleLine="true"
+                android:textColor="@android:color/black" />
+
+            <ImageButton
+                android:id="@+id/cancelBtn"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginRight="4dp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/selector_cancel" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+    <!--<include layout="@layout/titlebar_search" />-->
 
     <FrameLayout
         android:layout_width="match_parent"
