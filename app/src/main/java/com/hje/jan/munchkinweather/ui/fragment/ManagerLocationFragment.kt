@@ -14,6 +14,7 @@ import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import com.hje.jan.munchkinweather.ui.adapter.LocationMoveCallBack
 import com.hje.jan.munchkinweather.ui.adapter.ManagerLocationAdapter
 import kotlinx.android.synthetic.main.fragment_manager_location.*
+import kotlinx.android.synthetic.main.item_location_footer.*
 
 class ManagerLocationFragment : Fragment() {
 
@@ -45,6 +46,16 @@ class ManagerLocationFragment : Fragment() {
         dragHelper.attachToRecyclerView(recyclerview)
         adapter.addLocationListener = {
             (activity as ManagerLocationActivity).startAddLocation()
+        }
+        recyclerview.post {
+            if (recyclerview.height > recyclerview.computeVerticalScrollRange()) {
+                footer.visibility = View.GONE
+            } else {
+                footer.visibility = View.VISIBLE
+                addLocation.setOnClickListener {
+
+                }
+            }
         }
     }
 
