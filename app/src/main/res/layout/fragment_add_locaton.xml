@@ -8,6 +8,7 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:navigationIcon="@drawable/ic_back">
@@ -67,9 +68,7 @@
             layout="@layout/result_empty"
             android:visibility="gone"></include>
 
-        <com.hje.jan.munchkinweather.ui.widget.DefaultLocationLayout
-            android:id="@+id/default_location"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <include
+            layout="@layout/section_default_location" />
     </FrameLayout>
 </LinearLayout>

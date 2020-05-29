@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
-import com.hje.jan.munchkinweather.logic.model.LocationItemBean
 import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import com.hje.jan.munchkinweather.ui.adapter.LocationMoveCallBack
 import com.hje.jan.munchkinweather.ui.adapter.ManagerLocationAdapter
@@ -20,7 +19,6 @@ class ManagerLocationFragment : Fragment() {
 
     lateinit var adapter: ManagerLocationAdapter
     lateinit var dragHelper: ItemTouchHelper
-    private val locations: MutableList<LocationItemBean> by lazy { mutableListOf<LocationItemBean>() }
     companion object {
         fun newInstance(): ManagerLocationFragment {
             return ManagerLocationFragment()
@@ -37,7 +35,7 @@ class ManagerLocationFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        adapter = ManagerLocationAdapter(locations)
+        adapter = ManagerLocationAdapter((activity as ManagerLocationActivity).getLocations())
         dragHelper = ItemTouchHelper(LocationMoveCallBack(adapter))
         adapter.setHelper(dragHelper)
         recyclerview.layoutManager =
@@ -53,10 +51,17 @@ class ManagerLocationFragment : Fragment() {
             } else {
                 footer.visibility = View.VISIBLE
                 addLocation.setOnClickListener {
-
+                    (activity as ManagerLocationActivity).startAddLocation()
                 }
             }
         }
+        toolbar.setNavigationOnClickListener {
+            activity?.finish()
+        }
     }
 
+    override fun onResume() {
+        super.onResume()
+        adapter.notifyDataSetChanged()
+    }
 }

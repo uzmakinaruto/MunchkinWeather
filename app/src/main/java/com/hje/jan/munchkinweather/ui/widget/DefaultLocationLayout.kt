@@ -75,7 +75,7 @@ class DefaultLocationLayout : RelativeLayout {
             textView.gravity = Gravity.CENTER
             if (cityList[i].isSelect) {
                 textView.setTextColor(Color.WHITE)
-                textView.setBackgroundResource(R.drawable.shape_default_location_press)
+                textView.setBackgroundResource(R.drawable.shape_default_location_selected)
             } else {
                 textView.setTextColor(Color.BLACK)
                 textView.setBackgroundResource(R.drawable.shape_default_location)
@@ -87,7 +87,7 @@ class DefaultLocationLayout : RelativeLayout {
             textView.setOnClickListener {
                 cityList[i].isSelect = !cityList[i].isSelect
                 if (cityList[i].isSelect) {
-                    textView.setBackgroundResource(R.drawable.shape_default_location_press)
+                    textView.setBackgroundResource(R.drawable.shape_default_location_selected)
                     textView.setTextColor(Color.WHITE)
                 } else {
                     textView.setBackgroundResource(R.drawable.shape_default_location)
@@ -117,7 +117,7 @@ class DefaultLocationLayout : RelativeLayout {
             textView.gravity = Gravity.CENTER
             if (sightsList[i].isSelect) {
                 textView.setTextColor(Color.WHITE)
-                textView.setBackgroundResource(R.drawable.shape_default_location_press)
+                textView.setBackgroundResource(R.drawable.shape_default_location_selected)
             } else {
                 textView.setTextColor(Color.BLACK)
                 textView.setBackgroundResource(R.drawable.shape_default_location)
@@ -128,7 +128,7 @@ class DefaultLocationLayout : RelativeLayout {
             textView.setOnClickListener {
                 sightsList[i].isSelect = !sightsList[i].isSelect
                 if (sightsList[i].isSelect) {
-                    textView.setBackgroundResource(R.drawable.shape_default_location_press)
+                    textView.setBackgroundResource(R.drawable.shape_default_location_selected)
                     textView.setTextColor(Color.WHITE)
                 } else {
                     textView.setBackgroundResource(R.drawable.shape_default_location)

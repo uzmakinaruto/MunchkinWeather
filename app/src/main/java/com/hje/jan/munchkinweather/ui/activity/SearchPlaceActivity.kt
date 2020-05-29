@@ -11,7 +11,7 @@ import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 import com.hje.jan.munchkinweather.ui.adapter.SearchPlaceAdapter
 import com.hje.jan.munchkinweather.ui.adapter.SearchTextChangeAdapter
-import com.hje.jan.munchkinweather.ui.viewmodel.PlaceActivityViewModel
+import com.hje.jan.munchkinweather.ui.viewmodel.AddLocationFragmentViewModel
 import com.hje.jan.munchkinweather.util.WindowUtil
 import kotlinx.android.synthetic.main.activity_search_place.*
 import kotlinx.android.synthetic.main.titlebar_search.*
@@ -21,7 +21,7 @@ class SearchPlaceActivity : AppCompatActivity() {
 
     private val viewModel by lazy {
         ViewModelProvider(this).get(
-            PlaceActivityViewModel::class.java
+            AddLocationFragmentViewModel::class.java
         )
     }
     lateinit var adapter: SearchPlaceAdapter

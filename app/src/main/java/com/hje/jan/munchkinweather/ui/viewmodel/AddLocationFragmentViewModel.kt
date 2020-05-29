@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.hje.jan.munchkinweather.logic.Repository
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 
-class PlaceActivityViewModel : ViewModel() {
+class AddLocationFragmentViewModel : ViewModel() {
 
 
     private val searchPlace = MutableLiveData<String>()
