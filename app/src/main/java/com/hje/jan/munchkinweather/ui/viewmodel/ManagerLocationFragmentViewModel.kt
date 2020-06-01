@@ -5,29 +5,14 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.hje.jan.munchkinweather.logic.Repository
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
-import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class AddLocationFragmentViewModel : ViewModel() {
-
-
-    private val searchPlace = MutableLiveData<String>()
-    private val job = Job()
-    val places = Transformations.switchMap(searchPlace) { query ->
-        Repository.searchPlace(query)
-    }
-
-
-    val foundedPlaces = mutableListOf<PlaceResponse.Place>()
-
-    fun searchPlace(query: String) {
-        searchPlace.value = query
-    }
+class ManagerLocationFragmentViewModel : ViewModel() {
 
     private val _selectedLocations = MutableLiveData<Unit>()
-
+    private val job = Job()
     val selectLocations = Transformations.switchMap(_selectedLocations) {
         Repository.getLocations()
     }
@@ -35,18 +20,19 @@ class AddLocationFragmentViewModel : ViewModel() {
     fun addLocation(location: LocationItemBean) {
         CoroutineScope(job).launch {
             Repository.addLocation(location)
+            refreshLocations()
         }
-
     }
 
     fun deleteLocation(name: String) {
         CoroutineScope(job).launch {
             Repository.deleteLocation(name)
+            refreshLocations()
         }
     }
 
     fun refreshLocations() {
-        _selectedLocations.value = _selectedLocations.value
+        _selectedLocations.postValue(null)
     }
 
     var locations: MutableList<LocationItemBean> = mutableListOf()

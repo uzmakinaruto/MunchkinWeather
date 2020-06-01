@@ -7,11 +7,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
-import com.hje.jan.munchkinweather.logic.model.LocationItemBean
-import org.jetbrains.anko.backgroundResource
+import com.hje.jan.munchkinweather.logic.database.LocationItemBean
+import com.hje.jan.munchkinweather.ui.fragment.AddLocationFragment
 import org.jetbrains.anko.textColor
 
-class DefaultLocationAdapter(private val locations: List<LocationItemBean>) :
+class DefaultLocationAdapter(
+    private val locations: List<LocationItemBean>,
+    private val fragment: AddLocationFragment
+) :
     RecyclerView.Adapter<DefaultLocationAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -29,10 +32,13 @@ class DefaultLocationAdapter(private val locations: List<LocationItemBean>) :
                 location.isSelected = false
                 holder.name.textColor = Color.BLACK
                 holder.name.setBackgroundResource(R.drawable.shape_default_location)
+                fragment.viewModel.deleteLocation(location.name)
+
             } else {
                 location.isSelected = true
                 holder.name.textColor = Color.WHITE
                 holder.name.setBackgroundResource(R.drawable.shape_default_location_selected)
+                fragment.viewModel.addLocation(location)
             }
         }
         return holder
@@ -43,5 +49,12 @@ class DefaultLocationAdapter(private val locations: List<LocationItemBean>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val location = locations[position]
         holder.name.text = location.name
+        if (location.isSelected) {
+            holder.name.textColor = Color.WHITE
+            holder.name.setBackgroundResource(R.drawable.shape_default_location_selected)
+        } else {
+            holder.name.textColor = Color.BLACK
+            holder.name.setBackgroundResource(R.drawable.shape_default_location)
+        }
     }
 }

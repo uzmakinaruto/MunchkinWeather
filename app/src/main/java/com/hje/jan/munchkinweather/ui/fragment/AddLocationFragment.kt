@@ -12,9 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.model.DefaultLocations
-import com.hje.jan.munchkinweather.logic.model.LocationItemBean
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
-import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import com.hje.jan.munchkinweather.ui.activity.WeatherActivity
 import com.hje.jan.munchkinweather.ui.adapter.DefaultLocationAdapter
 import com.hje.jan.munchkinweather.ui.adapter.SearchPlaceAdapter
@@ -26,7 +24,7 @@ import org.jetbrains.anko.startActivity
 
 class AddLocationFragment : Fragment() {
 
-    private val viewModel by lazy {
+    val viewModel by lazy {
         ViewModelProvider(this).get(
             AddLocationFragmentViewModel::class.java
         )
@@ -57,7 +55,6 @@ class AddLocationFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         initTitleBar()
-        initDefaultRV()
         initSearchRV()
         viewModel.places.observe(viewLifecycleOwner, Observer { result ->
             /**搜索栏不为空时才显示搜索内容,不然搜索结果延迟会导致UI显示错乱*/
@@ -73,19 +70,34 @@ class AddLocationFragment : Fragment() {
                 }
             }
         })
+        viewModel.selectLocations.observe(viewLifecycleOwner, Observer { result ->
+            viewModel.locations = result
+            initDefaultRV()
+        })
+        viewModel.refreshLocations()
     }
 
     private fun initDefaultRV() {
+        initDefaultLocations()
         val layoutManager1 = GridLayoutManager(context, 4)
         val layoutManager2 = GridLayoutManager(context, 4)
-        defaultCityAdapter = DefaultLocationAdapter(defaultCities)
-        defaultViewAdapter = DefaultLocationAdapter(defaultViews)
+        defaultCityAdapter = DefaultLocationAdapter(defaultCities, this)
+        defaultViewAdapter = DefaultLocationAdapter(defaultViews, this)
         defaultCitiesRV.layoutManager = layoutManager1
         defaultViewsRV.layoutManager = layoutManager2
         defaultCitiesRV.adapter = defaultCityAdapter
         defaultViewsRV.adapter = defaultViewAdapter
     }
 
+    private fun initDefaultLocations() {
+        val selected = viewModel.locations
+        defaultCities.forEach {
+            it.isSelected = selected.contains(it)
+        }
+        defaultViews.forEach {
+            it.isSelected = selected.contains(it)
+        }
+    }
     private fun initTitleBar() {
         toolbar.setNavigationOnClickListener {
             activity?.supportFragmentManager?.popBackStack()
@@ -122,14 +134,6 @@ class AddLocationFragment : Fragment() {
         viewModel.foundedPlaces.clear()
         viewModel.foundedPlaces.addAll(places)
         searchAdapter.notifyDataSetChanged()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        val selected = mutableListOf<LocationItemBean>()
-        selected.addAll(defaultCities)
-        selected.addAll(defaultViews)
-        (activity as ManagerLocationActivity).setLocation(selected)
     }
 
 }

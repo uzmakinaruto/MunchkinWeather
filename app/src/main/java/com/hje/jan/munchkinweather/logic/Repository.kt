@@ -1,14 +1,20 @@
 package com.hje.jan.munchkinweather.logic
 
 import androidx.lifecycle.liveData
+import com.hje.jan.munchkinweather.logic.database.LocationItemBean
+import com.hje.jan.munchkinweather.logic.database.MunchkinWeatherDataBase
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 import com.hje.jan.munchkinweather.logic.model.WeatherResponse
 import com.hje.jan.munchkinweather.logic.network.MunchkinWeatherNetwork
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 
 object Repository {
+
+    private val locationDao = MunchkinWeatherDataBase.instance.locationDao()
+
     fun searchPlace(query: String) = liveData(Dispatchers.IO) {
         val result = try {
             val response = MunchkinWeatherNetwork.searchPlace(query)
@@ -50,5 +56,21 @@ object Repository {
             }
         }
         emit(result)
+    }
+
+    suspend fun addLocation(location: LocationItemBean) {
+        withContext(Dispatchers.IO) {
+            locationDao.addLocation(location)
+        }
+    }
+
+    fun getLocations() = liveData(Dispatchers.IO) {
+        emit(locationDao.getLocations())
+    }
+
+    suspend fun deleteLocation(name: String) {
+        withContext(Dispatchers.IO) {
+            locationDao.deleteLocationByName(name)
+        }
     }
 }

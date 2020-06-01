@@ -8,7 +8,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
-import com.hje.jan.munchkinweather.logic.model.LocationItemBean
+import com.hje.jan.munchkinweather.logic.database.LocationItemBean
+import com.hje.jan.munchkinweather.ui.fragment.ManagerLocationFragment
 import com.hje.jan.munchkinweather.ui.widget.LocationHeaderView
 import com.hje.jan.munchkinweather.ui.widget.LocationItemView
 import com.hje.jan.munchkinweather.util.AvoidDoubleClickUtil
@@ -19,7 +20,8 @@ import java.util.*
 
 
 class ManagerLocationAdapter(
-    private val locations: MutableList<LocationItemBean>
+    private val locations: MutableList<LocationItemBean>,
+    private val fragment: ManagerLocationFragment
 ) :
     RecyclerView.Adapter<ManagerLocationAdapter.ViewHolder>() {
 
@@ -66,16 +68,13 @@ class ManagerLocationAdapter(
                 holder = ViewHolder(itemView)
                 itemView.removeLocation.setOnClickListener {
                     if (AvoidDoubleClickUtil.isClickable()) {
-                        Log.d("ManagerLocation", "remove: ${holder.adapterPosition}")
-                        locations.removeAt(holder.adapterPosition - 1)
-                        //notifyItemRemoved(holder.adapterPosition)
-                        notifyDataSetChanged()
+                       // locations.removeAt(holder.adapterPosition - 1)
+                        fragment.viewModel.deleteLocation(locations[holder.adapterPosition - 1].name)
                     }
                 }
                 itemView.thumb.setOnTouchListener { v, event ->
                     if (event.action == MotionEvent.ACTION_DOWN) {
                         helper?.startDrag(holder)
-
                     }
                     true
                 }

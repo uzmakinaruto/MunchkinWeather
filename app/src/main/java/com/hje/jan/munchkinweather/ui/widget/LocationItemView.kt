@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.RelativeLayout
 import com.hje.jan.munchkinweather.R
-import com.hje.jan.munchkinweather.logic.model.LocationItemBean
+import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import kotlinx.android.synthetic.main.item_location.view.*
 
 class LocationItemView : RelativeLayout {
