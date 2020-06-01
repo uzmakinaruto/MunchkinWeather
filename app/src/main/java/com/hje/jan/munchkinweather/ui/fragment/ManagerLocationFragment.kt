@@ -45,7 +45,7 @@ class ManagerLocationFragment : Fragment() {
         initRecyclerView()
     }
 
-    fun initRecyclerView() {
+    private fun initRecyclerView() {
         adapter = ManagerLocationAdapter(viewModel.locations, this)
         dragHelper = ItemTouchHelper(LocationMoveCallBack(adapter))
         adapter.setHelper(dragHelper)

@@ -12,45 +12,46 @@ import kotlinx.coroutines.launch
 
 class AddLocationFragmentViewModel : ViewModel() {
 
-
-    private val searchPlace = MutableLiveData<String>()
     private val job = Job()
-    val places = Transformations.switchMap(searchPlace) { query ->
+    /**搜索到的地址*/
+    private val _places = MutableLiveData<String>()
+    val places = Transformations.switchMap(_places) { query ->
         Repository.searchPlace(query)
     }
-
-
     val foundedPlaces = mutableListOf<PlaceResponse.Place>()
 
     fun searchPlace(query: String) {
-        searchPlace.value = query
+        _places.value = query
     }
 
+    /**选中的地址*/
     private val _selectedLocations = MutableLiveData<Unit>()
 
     val selectLocations = Transformations.switchMap(_selectedLocations) {
         Repository.getLocations()
     }
 
+    fun refreshLocations() {
+        _selectedLocations.value = _selectedLocations.value
+    }
+
+    val locations: MutableList<LocationItemBean> = mutableListOf()
+
+    /**添加地址到数据库*/
     fun addLocation(location: LocationItemBean) {
         CoroutineScope(job).launch {
             Repository.addLocation(location)
         }
-
     }
 
+    /**从数据库中删除地址*/
     fun deleteLocation(name: String) {
         CoroutineScope(job).launch {
             Repository.deleteLocation(name)
         }
     }
-
-    fun refreshLocations() {
-        _selectedLocations.value = _selectedLocations.value
-    }
-
-    var locations: MutableList<LocationItemBean> = mutableListOf()
-
+    
+    /**释放协程*/
     override fun onCleared() {
         super.onCleared()
         job.cancel()

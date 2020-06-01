@@ -71,7 +71,8 @@ class AddLocationFragment : Fragment() {
             }
         })
         viewModel.selectLocations.observe(viewLifecycleOwner, Observer { result ->
-            viewModel.locations = result
+            viewModel.locations.clear()
+            viewModel.locations.addAll(result)
             initDefaultRV()
         })
         viewModel.refreshLocations()
