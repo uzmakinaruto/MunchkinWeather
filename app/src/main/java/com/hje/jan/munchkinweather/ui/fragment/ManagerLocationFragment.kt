@@ -12,17 +12,23 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
+import com.hje.jan.munchkinweather.ui.activity.WeatherActivity
 import com.hje.jan.munchkinweather.ui.adapter.LocationMoveCallBack
 import com.hje.jan.munchkinweather.ui.adapter.ManagerLocationAdapter
 import com.hje.jan.munchkinweather.ui.viewmodel.ManagerLocationFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_manager_location.*
 import kotlinx.android.synthetic.main.item_location_footer.*
+import org.jetbrains.anko.okButton
+import org.jetbrains.anko.support.v4.alert
+import org.jetbrains.anko.support.v4.startActivity
+import org.jetbrains.anko.support.v4.toast
 
 class ManagerLocationFragment : Fragment() {
 
     lateinit var adapter: ManagerLocationAdapter
     lateinit var dragHelper: ItemTouchHelper
     val viewModel by lazy { ViewModelProvider(this).get(ManagerLocationFragmentViewModel::class.java) }
+
     companion object {
         fun newInstance(): ManagerLocationFragment {
             return ManagerLocationFragment()
@@ -40,7 +46,17 @@ class ManagerLocationFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         toolbar.setNavigationOnClickListener {
-            activity?.finish()
+            if (viewModel.locations.size == 0) {
+                alert {
+                    title = "请先添加一个城市"
+                    okButton {
+                        "确定"
+                    }
+                }.show()
+            } else {
+                activity?.finish()
+                startActivity<WeatherActivity>()
+            }
         }
         initRecyclerView()
     }

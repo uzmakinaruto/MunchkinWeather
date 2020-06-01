@@ -53,7 +53,9 @@
             app:piv_radius="2dp"
             app:piv_selectedColor="#707070"
             app:piv_unselectedColor="#8a8a8a"
-            app:piv_viewPager="@id/viewPager" />
+            app:piv_viewPager="@id/viewPager"
+            app:piv_dynamicCount="true"
+            app:piv_interactiveAnimation="true"/>
     </LinearLayout>
 
     <ImageButton

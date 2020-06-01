@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import com.hje.jan.munchkinweather.R
@@ -24,18 +25,20 @@ class WeatherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
         WindowUtil.showTransparentStatusBar(this)
-        val place = intent.getParcelableExtra<PlaceResponse.Place>("place")
-        if (null != place) viewModel.place = place
         initViewPager()
         initVideoView()
-        initTitleBar()
     }
 
-
     private fun initViewPager() {
-        if (viewModel.fragments.isEmpty()) {
-            viewModel.fragments.add(WeatherFragment.newInstance(viewModel.place))
-        }
+        viewModel.selectLocations.observe(this, Observer { locations ->
+            viewModel.fragments.clear()
+            for (location in locations) {
+                val fragment = WeatherFragment.newInstance(location)
+                viewModel.fragments.add(fragment)
+            }
+            viewPager.adapter?.notifyDataSetChanged()
+            locationText.text = viewModel.fragments[viewPager.currentItem].location.name
+        })
         viewPager.adapter = WeatherViewPagerAdapter(supportFragmentManager, viewModel.fragments)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
@@ -56,8 +59,11 @@ class WeatherActivity : AppCompatActivity() {
             }
 
             override fun onPageSelected(position: Int) {
+                locationText.text = viewModel.fragments[position].location.name
+                titleBarTempText.text = viewModel.fragments[position].getCurrentTemp()
             }
         })
+        viewModel.refreshLocations()
     }
 
     /**为了防止VideoView播放前显示黑色背景 需要在xml设置videoView背景为非透明色*/
@@ -76,9 +82,6 @@ class WeatherActivity : AppCompatActivity() {
         }
     }
 
-    private fun initTitleBar() {
-        locationText.text = viewModel.place.name
-    }
 
     override fun onResume() {
         super.onResume()
