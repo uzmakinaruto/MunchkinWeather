@@ -35,6 +35,12 @@ class ManagerLocationFragmentViewModel : ViewModel() {
         _selectedLocations.postValue(null)
     }
 
+    fun updateLocation(location: LocationItemBean) {
+        CoroutineScope(job).launch {
+            Repository.updateLocation(location)
+        }
+    }
+
     var locations: MutableList<LocationItemBean> = mutableListOf()
 
     override fun onCleared() {

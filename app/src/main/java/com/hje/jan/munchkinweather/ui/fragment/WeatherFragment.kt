@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.extension.dp2px
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
-import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 import com.hje.jan.munchkinweather.ui.activity.WeatherActivity
 import com.hje.jan.munchkinweather.ui.adapter.DailyAdapter
 import com.hje.jan.munchkinweather.ui.adapter.HourlyAdapter
@@ -37,11 +36,9 @@ import java.util.*
 
 
 class WeatherFragment : Fragment() {
-    lateinit var location: LocationItemBean
     var scrollToShowTitleBarDistance = 0
     lateinit var titleBar: View
     lateinit var titleBarTempText: TextView
-    /*lateinit var titleBarLocationText: TextView*/
     lateinit var videoView: VideoView
     lateinit var hourlyAdapter: HourlyAdapter
     lateinit var dailyAdapter: DailyAdapter
@@ -60,13 +57,13 @@ class WeatherFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        location = arguments?.getParcelable("location")!!
-        Log.d("MunchkinWeather", "onAttach-${location.name}")
+        viewModel.location = arguments?.getParcelable("location")!!
+        Log.d("MunchkinWeather", "onAttach-${viewModel.location.name}")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("MunchkinWeather", "onCreate-${location.name}")
+        Log.d("MunchkinWeather", "onCreate-${viewModel.location.name}")
     }
 
     override fun onCreateView(
@@ -74,39 +71,39 @@ class WeatherFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d("MunchkinWeather", "onCreateView-${location.name}")
+        Log.d("MunchkinWeather", "onCreateView-${viewModel.location.name}")
         return inflater.inflate(R.layout.fragment_weather, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        Log.d("MunchkinWeather", "onActivityCreated-${location.name}")
+        Log.d("MunchkinWeather", "onActivityCreated-${viewModel.location.name}")
         weatherUiInit()
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d("MunchkinWeather", "onResume-${location.name}")
+        Log.d("MunchkinWeather", "onResume-${viewModel.location.name}")
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d("MunchkinWeather", "onPause-${location.name}")
+        Log.d("MunchkinWeather", "onPause-${viewModel.location.name}")
     }
 
     override fun onStop() {
         super.onStop()
-        Log.d("MunchkinWeather", "onStop-${location.name}")
+        Log.d("MunchkinWeather", "onStop-${viewModel.location.name}")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("MunchkinWeather", "onDestroy-${location.name}")
+        Log.d("MunchkinWeather", "onDestroy-${viewModel.location.name}")
     }
 
     override fun onDetach() {
         super.onDetach()
-        Log.d("MunchkinWeather", "onDetach-${location.name}")
+        Log.d("MunchkinWeather", "onDetach-${viewModel.location.name}")
     }
 
     private fun initActivityView() {
@@ -124,7 +121,7 @@ class WeatherFragment : Fragment() {
         if (diff1 > 1f) diff1 = 1f
         if (isShowTitleBarBg) titleBar.setBackgroundColor(Color.WHITE)
         else titleBar.setBackgroundColor(Color.TRANSPARENT)
-        bg.setBackgroundColor((((diff1 * 0xFF).toInt() shl 24) or 0x00FFFFFF))
+        weatherInfo.setBackgroundColor((((diff1 * 0xFF).toInt() shl 24) or 0x00FFFFFF))
         videoView.translationY = -scrollY.toFloat() / 2
         if (scrollY > scrollToShowTitleBarDistance) {
             val diff2 = scrollY - (SCROLL_TO_TOP - titleBar.height)
@@ -135,6 +132,8 @@ class WeatherFragment : Fragment() {
         } else {
             titleBarTempText.alpha = 0f
         }
+        Log.d("scrollTo", "${viewModel.location.name} updateTo ->${scrollY}")
+        (activity as WeatherActivity).viewModel.updateScrollY(scrollY)
     }
 
     private fun weatherUiInit() {
@@ -165,7 +164,7 @@ class WeatherFragment : Fragment() {
         dailyAdapter = DailyAdapter(viewModel.dailyResult)
         dailyRV.layoutManager = LinearLayoutManager(context)
         dailyRV.adapter = dailyAdapter
-        viewModel.refreshWeather(location.lng, location.lat)
+        viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
         aqiLayout.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 aqiLayout.alpha = 0.5f
@@ -174,7 +173,13 @@ class WeatherFragment : Fragment() {
             }
             true
         }
+        scrollView.viewTreeObserver.addOnGlobalLayoutListener {
+            (activity as WeatherActivity).viewModel.currentScrollY.value?.let { position ->
+                scrollTo(position)
+            }
+        }
     }
+
 
     private fun refreshWeatherUI() {
         viewModel.hourResult?.let {
@@ -188,14 +193,14 @@ class WeatherFragment : Fragment() {
             washCarIndex.text = it.life_index.carWashing[0].desc
         }
         viewModel.realtimeResult?.let {
-            bg.visibility = View.VISIBLE
+            weatherInfo.visibility = View.VISIBLE
             skyConText.text = WeatherUtil.getSkyConDescription(it.skycon)
             tempText.text = it.temperature.toInt().toString()
             aqiStatus.text = it.airQuality.description.chn
             aqiValue.text = it.airQuality.aqi.chn.toString()
             windLevel.text = WeatherUtil.getWindLevel(it.wind.speed).toString()
             windDirection.text = WeatherUtil.getWindDirectionString(it.wind.direction)
-            humidity.text = (it.humidity * 100).toString()
+            humidity.text = (it.humidity * 100).toInt().toString()
             apparentTemp.text = it.apparentTemperature.toInt().toString()
             pressure.text = (it.pressure / 100).toInt().toString()
             dayText.text = Calendar.getInstance().get(Calendar.DAY_OF_MONTH).toString()
@@ -208,14 +213,21 @@ class WeatherFragment : Fragment() {
             ultravioletIndex.text = it.lifeIndex.ultraviolet.desc
             comfortIndex.text = it.lifeIndex.comfort.desc
             visibilityIndex.text = "${it.visibility.toInt()}公里"
-            videoView.setVideoURI(
-                Uri.parse(
-                    "android.resource://${activity!!.packageName}/${WeatherUtil.getVideoNameBySkyCon(
-                        it.skycon
-                    )}"
+            viewModel.location.skyCon = it.skycon
+            viewModel.location.temp = it.temperature.toInt()
+            viewModel.updateLocation()
+            if ((activity as WeatherActivity).getCurrentLocation() == viewModel.location) {
+                /**首个fragment需要在这里刷新,其他在viewpager切换时刷新*/
+                titleBarTempText.text = "${it.temperature.toInt()}°"
+                videoView.setVideoURI(
+                    Uri.parse(
+                        "android.resource://${(activity as WeatherActivity).packageName}/${WeatherUtil.getVideoNameBySkyCon(
+                            it.skycon
+                        )}"
+                    )
                 )
-            )
-            videoView.start()
+                videoView.start()
+            }
         }
     }
 
@@ -224,5 +236,18 @@ class WeatherFragment : Fragment() {
             return "${it.temperature.toInt()}°"
         }
         return ""
+    }
+
+    fun getSkyCon(): String? {
+        return viewModel.realtimeResult?.skycon
+    }
+
+    fun scrollTo(scrollY: Int) {
+        if (null == scrollView) {
+            Log.v("scrollTo", "fragment is not init")
+        } else {
+            Log.v("scrollTo", "${viewModel.location.name} scrollTo ${scrollY}")
+        }
+        scrollView?.scrollTo(0, scrollY)
     }
 }

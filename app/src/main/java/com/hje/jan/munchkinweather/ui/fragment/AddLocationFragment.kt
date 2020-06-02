@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hje.jan.munchkinweather.R
+import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.logic.model.DefaultLocations
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 import com.hje.jan.munchkinweather.ui.activity.WeatherActivity
@@ -20,7 +21,7 @@ import com.hje.jan.munchkinweather.ui.adapter.SearchTextChangeAdapter
 import com.hje.jan.munchkinweather.ui.viewmodel.AddLocationFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_add_locaton.*
 import kotlinx.android.synthetic.main.section_default_location.*
-import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.support.v4.startActivity
 
 class AddLocationFragment : Fragment() {
 
@@ -127,7 +128,22 @@ class AddLocationFragment : Fragment() {
         recyclerview.adapter = searchAdapter
         recyclerview.layoutManager = LinearLayoutManager(context)
         searchAdapter.onClickListener = {
-            activity?.startActivity<WeatherActivity>("place" to it)
+            var position = 0
+            val location = LocationItemBean(it.name, it.location.lng, it.location.lat)
+            if (!viewModel.locations.contains(location)) {
+                position = viewModel.locations.size
+                location.position = position
+                viewModel.addLocation(location)
+            } else {
+                viewModel.locations.forEach here@{ item ->
+                    if (item == location) {
+                        position = item.position
+                        return@here
+                    }
+                }
+            }
+            startActivity<WeatherActivity>("position" to position)
+            activity?.finish()
         }
     }
 

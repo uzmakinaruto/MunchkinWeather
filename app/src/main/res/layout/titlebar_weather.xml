@@ -27,7 +27,7 @@
                 android:id="@+id/locationText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="东莞市"
+                android:text=""
                 android:ellipsize="end"
                 android:maxWidth="200dp"
                 android:singleLine="true"
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:alpha="0"
-                android:text="29°"
+                android:text=""
                 android:textColor="@android:color/black"
                 android:textSize="18sp" />
         </LinearLayout>
@@ -59,7 +59,7 @@
     </LinearLayout>
 
     <ImageButton
-        android:id="@+id/moreBtn"
+        android:id="@+id/managerLocationBtn"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginRight="16dp"

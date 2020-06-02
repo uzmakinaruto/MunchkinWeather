@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.item_location_footer.*
 import org.jetbrains.anko.okButton
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.support.v4.startActivity
-import org.jetbrains.anko.support.v4.toast
 
 class ManagerLocationFragment : Fragment() {
 
@@ -55,7 +54,6 @@ class ManagerLocationFragment : Fragment() {
                 }.show()
             } else {
                 activity?.finish()
-                startActivity<WeatherActivity>()
             }
         }
         initRecyclerView()
@@ -88,5 +86,13 @@ class ManagerLocationFragment : Fragment() {
             }
         })
         viewModel.refreshLocations()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        for ((index, location) in viewModel.locations.withIndex()) {
+            location.position = index
+            viewModel.updateLocation(location)
+        }
     }
 }

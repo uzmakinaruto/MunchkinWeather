@@ -1,9 +1,6 @@
 package com.hje.jan.munchkinweather.logic.database
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface LocationDao {
@@ -11,7 +8,7 @@ interface LocationDao {
     @Insert
     fun addLocation(location: LocationItemBean)
 
-    @Query("select * from LocationItemBean")
+    @Query("select * from LocationItemBean order by position")
     fun getLocations(): MutableList<LocationItemBean>
 
     @Delete
@@ -19,4 +16,7 @@ interface LocationDao {
 
     @Query("delete from LocationItemBean where name = :name")
     fun deleteLocationByName(name: String)
+
+    @Update
+    fun updateLocation(location: LocationItemBean)
 }

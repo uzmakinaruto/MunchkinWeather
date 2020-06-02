@@ -95,7 +95,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:checked="true"
+        android:checked="false"
         app:kswBackDrawable="@drawable/flyme_back_drawable"
         app:kswThumbDrawable="@drawable/flyme_thumb_drawable"
         app:kswThumbHeight="16dp"

@@ -13,12 +13,14 @@ data class LocationItemBean(
     val lat: String,
     var skyCon: String? = null,
     var temp: Int? = null,
-    var isSelected: Boolean = false
+    var isSelected: Boolean = false,
+    var position: Int = 0
 ) : Parcelable {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 
     override fun equals(other: Any?): Boolean {
-        return (other as LocationItemBean).name == name
+        val otherItem = (other as LocationItemBean)
+        return otherItem.lng == lng && other.lat == lat
     }
 }

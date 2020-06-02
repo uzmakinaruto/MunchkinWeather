@@ -87,7 +87,7 @@ object WeatherUtil {
         }
     }
 
-    fun getSkyConDescription(skyCon: String): String {
+    fun getSkyConDescription(skyCon: String?): String {
         return when (skyCon) {
             "CLEAR_DAY" -> "晴"
             "CLEAR_NIGHT" -> "晴"
@@ -109,11 +109,11 @@ object WeatherUtil {
             "DUST" -> "浮尘"
             "SAND" -> "沙尘"
             "WIND" -> "大风"
-            else -> throw RuntimeException("Unknown skyCon")
+            else -> "N/A"
         }
     }
 
-    fun getSkyConImage(skyCon: String): Int {
+    fun getSkyConImage(skyCon: String?): Int {
         return when (skyCon) {
             "CLEAR_DAY" -> R.drawable.ic_week_sun
             "CLEAR_NIGHT" -> R.drawable.ic_week_sun_night
@@ -135,7 +135,7 @@ object WeatherUtil {
             "DUST" -> R.drawable.ic_week_dust
             "SAND" -> R.drawable.ic_week_dust_storm
             "WIND" -> R.drawable.ic_week_cloudy
-            else -> throw RuntimeException("Unknown skyCon")
+            else -> R.drawable.ic_week_na
         }
     }
 

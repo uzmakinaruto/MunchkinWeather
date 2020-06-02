@@ -73,4 +73,10 @@ object Repository {
             locationDao.deleteLocationByName(name)
         }
     }
+
+    suspend fun updateLocation(location: LocationItemBean) {
+        withContext(Dispatchers.IO) {
+            locationDao.updateLocation(location)
+        }
+    }
 }
