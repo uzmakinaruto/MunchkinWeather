@@ -1,5 +1,7 @@
 package com.hje.jan.munchkinweather.ui.fragment
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -14,14 +16,12 @@ import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.logic.model.DefaultLocations
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
-import com.hje.jan.munchkinweather.ui.activity.WeatherActivity
 import com.hje.jan.munchkinweather.ui.adapter.DefaultLocationAdapter
 import com.hje.jan.munchkinweather.ui.adapter.SearchPlaceAdapter
 import com.hje.jan.munchkinweather.ui.adapter.SearchTextChangeAdapter
 import com.hje.jan.munchkinweather.ui.viewmodel.AddLocationFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_add_locaton.*
 import kotlinx.android.synthetic.main.section_default_location.*
-import org.jetbrains.anko.support.v4.startActivity
 
 class AddLocationFragment : Fragment() {
 
@@ -142,7 +142,7 @@ class AddLocationFragment : Fragment() {
                     }
                 }
             }
-            startActivity<WeatherActivity>("position" to position)
+            activity?.setResult(RESULT_OK, Intent().apply { putExtra("position", position) })
             activity?.finish()
         }
     }

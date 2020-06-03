@@ -1,6 +1,5 @@
 package com.hje.jan.munchkinweather.ui.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -24,12 +23,6 @@ class WeatherActivityViewModel : ViewModel() {
 
     val locations: MutableList<LocationItemBean> = mutableListOf()
 
-    val currentScrollY: LiveData<Int>
-        get() = _currentScrollY
-
-    private val _currentScrollY = MutableLiveData<Int>()
-
-    fun updateScrollY(scrollY: Int) {
-        _currentScrollY.value = scrollY
-    }
+    var currentPosition = 0
+    var currentItem = 0
 }

@@ -30,9 +30,9 @@ object Repository {
     }
 
     fun refreshWeather(lng: String, lat: String) = liveData(Dispatchers.IO) {
-        val result = coroutineScope {
-            /**这里会并发执行*/
-            try {
+        val result = try {
+            coroutineScope {
+                /**这里会并发执行*/
                 val realtime = async { MunchkinWeatherNetwork.getRealtimeResponse(lng, lat) }
                 val daily = async { MunchkinWeatherNetwork.getDailyResponse(lng, lat, 5) }
                 val hourly = async { MunchkinWeatherNetwork.getHourlyResponse(lng, lat) }
@@ -51,9 +51,9 @@ object Repository {
                 } else {
                     Result.failure(RuntimeException("status is not ok"))
                 }
-            } catch (e: Exception) {
-                Result.failure<WeatherResponse>(e)
             }
+        } catch (e: Exception) {
+            Result.failure<WeatherResponse>(e)
         }
         emit(result)
     }

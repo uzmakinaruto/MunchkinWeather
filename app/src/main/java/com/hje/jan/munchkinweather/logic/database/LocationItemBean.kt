@@ -21,6 +21,6 @@ data class LocationItemBean(
 
     override fun equals(other: Any?): Boolean {
         val otherItem = (other as LocationItemBean)
-        return otherItem.lng == lng && other.lat == lat
+        return otherItem.name == name
     }
 }

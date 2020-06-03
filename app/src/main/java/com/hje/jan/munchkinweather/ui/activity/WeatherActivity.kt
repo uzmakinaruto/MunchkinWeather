@@ -1,5 +1,7 @@
 package com.hje.jan.munchkinweather.ui.activity
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.net.Uri
@@ -10,7 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import com.hje.jan.munchkinweather.R
-import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.ui.adapter.WeatherViewPagerAdapter
 import com.hje.jan.munchkinweather.ui.fragment.WeatherFragment
 import com.hje.jan.munchkinweather.ui.viewmodel.WeatherActivityViewModel
@@ -27,14 +28,14 @@ class WeatherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
         WindowUtil.showTransparentStatusBar(this)
-        initViewPager()
         initVideoView()
+        initViewPager()
         initToolbar()
     }
 
     private fun initToolbar() {
         managerLocationBtn.setOnClickListener {
-            startActivity<ManagerLocationActivity>()
+            startActivityForResult(Intent(this, ManagerLocationActivity::class.java), 0)
         }
     }
 
@@ -53,17 +54,28 @@ class WeatherActivity : AppCompatActivity() {
                 }
                 viewPager.adapter?.notifyDataSetChanged()
                 locationText.text = locations[viewPager.currentItem].name
-                val position = intent.getIntExtra("position", -1)
-                if (position != -1) {
-                    viewPager.currentItem = position
-                }
-                pageIndicatorView.selection = position
+                viewPager.currentItem = viewModel.currentItem
+                pageIndicatorView.selection = viewModel.currentItem
+
             }
         })
+        viewPager.offscreenPageLimit = 2
         viewPager.adapter = WeatherViewPagerAdapter(supportFragmentManager, viewModel.fragments)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
-
+                Log.d("StateChanged", "state:${state}")
+                if (state == ViewPager.SCROLL_STATE_DRAGGING) {
+                    val currentIndex = viewPager.currentItem
+                    val position = viewModel.fragments[currentIndex].getCurrentPosition()
+                    viewModel.currentPosition = position
+                    /**把当前fragment的前一个后一个fragment滚动到相同位置*/
+                    if (currentIndex > 0) {
+                        viewModel.fragments[currentIndex - 1].scrollTo(position)
+                    }
+                    if (currentIndex < viewModel.fragments.size - 1) {
+                        viewModel.fragments[currentIndex + 1].scrollTo(position)
+                    }
+                }
             }
             override fun onPageScrolled(
                 position: Int,
@@ -80,11 +92,13 @@ class WeatherActivity : AppCompatActivity() {
             }
 
             override fun onPageSelected(position: Int) {
+                viewModel.currentItem = position
+                val fragment = viewModel.fragments[position]
                 clapBoard.alpha = 0f
                 locationText.text = viewModel.locations[position].name
-                titleBarTempText.text = viewModel.fragments[position].getCurrentTemp()
+                titleBarTempText.text = fragment.getCurrentTemp()
                 videoView.pause()
-                viewModel.fragments[position].getSkyCon()?.let { skyCon ->
+                fragment.getSkyCon()?.let { skyCon ->
                     videoView.setVideoURI(
                         Uri.parse(
                             "android.resource://${packageName}/${WeatherUtil.getVideoNameBySkyCon(
@@ -94,13 +108,6 @@ class WeatherActivity : AppCompatActivity() {
                     )
                     videoView.start()
                 }
-            }
-        })
-
-        viewModel.currentScrollY.observe(this, Observer { position ->
-            Log.d("position", "position:${position}")
-            for (fragment in viewModel.fragments) {
-                fragment.scrollTo(position)
             }
         })
     }
@@ -125,14 +132,15 @@ class WeatherActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.refreshLocations()
-        if (!videoView.isPlaying)
-            videoView.start()
     }
 
     override fun onPause() {
         super.onPause()
-        if (videoView.isPlaying)
+        if (videoView.isPlaying) {
             videoView.pause()
+        }
+        videoView.setBackgroundColor(Color.WHITE)
+        viewModel.currentPosition = viewModel.fragments[viewPager.currentItem].getCurrentPosition()
     }
 
     override fun onDestroy() {
@@ -140,7 +148,14 @@ class WeatherActivity : AppCompatActivity() {
         videoView.stopPlayback()
     }
 
-    fun getCurrentLocation(): LocationItemBean {
-        return viewModel.locations[viewPager.currentItem]
+    fun isCurrentFragment(fragment: WeatherFragment): Boolean {
+        return viewModel.fragments[viewPager.currentItem] == fragment
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
+            viewModel.currentItem = data?.getIntExtra("position", 0) ?: 0
+        }
     }
 }
