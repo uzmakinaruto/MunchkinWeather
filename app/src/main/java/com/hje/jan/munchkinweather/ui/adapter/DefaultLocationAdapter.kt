@@ -8,12 +8,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
-import com.hje.jan.munchkinweather.ui.fragment.AddLocationFragment
+import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import org.jetbrains.anko.textColor
 
 class DefaultLocationAdapter(
     private val locations: List<LocationItemBean>,
-    private val fragment: AddLocationFragment
+    private val activity: ManagerLocationActivity
 ) :
     RecyclerView.Adapter<DefaultLocationAdapter.ViewHolder>() {
 
@@ -32,13 +32,14 @@ class DefaultLocationAdapter(
                 location.isSelected = false
                 holder.name.textColor = Color.BLACK
                 holder.name.setBackgroundResource(R.drawable.shape_default_location)
-                fragment.viewModel.deleteLocation(location.name)
+                activity.viewModel.deleteLocation(location.name)
 
             } else {
                 location.isSelected = true
                 holder.name.textColor = Color.WHITE
                 holder.name.setBackgroundResource(R.drawable.shape_default_location_selected)
-                fragment.viewModel.addLocation(location)
+                activity.viewModel.addLocation(location)
+                activity.viewModel.getLocationWeatherInfo(location)
             }
         }
         return holder

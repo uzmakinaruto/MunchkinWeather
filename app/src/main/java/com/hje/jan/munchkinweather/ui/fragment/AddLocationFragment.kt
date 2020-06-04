@@ -16,6 +16,7 @@ import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.logic.model.DefaultLocations
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
+import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import com.hje.jan.munchkinweather.ui.adapter.DefaultLocationAdapter
 import com.hje.jan.munchkinweather.ui.adapter.SearchPlaceAdapter
 import com.hje.jan.munchkinweather.ui.adapter.SearchTextChangeAdapter
@@ -34,7 +35,7 @@ class AddLocationFragment : Fragment() {
     lateinit var defaultCityAdapter: DefaultLocationAdapter
     lateinit var defaultViewAdapter: DefaultLocationAdapter
     lateinit var searchAdapter: SearchPlaceAdapter
-
+    lateinit var managerLocationActivity: ManagerLocationActivity
     private val defaultCities = DefaultLocations.CITIES
     private val defaultViews = DefaultLocations.VIEWS
 
@@ -55,6 +56,7 @@ class AddLocationFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        managerLocationActivity = activity as ManagerLocationActivity
         initTitleBar()
         initSearchRV()
         viewModel.places.observe(viewLifecycleOwner, Observer { result ->
@@ -71,20 +73,22 @@ class AddLocationFragment : Fragment() {
                 }
             }
         })
-        viewModel.selectLocations.observe(viewLifecycleOwner, Observer { result ->
-            viewModel.locations.clear()
-            viewModel.locations.addAll(result)
+        managerLocationActivity.viewModel.locationsLiveData.observe(
+            viewLifecycleOwner,
+            Observer { result ->
+                managerLocationActivity.viewModel.locations.clear()
+                managerLocationActivity.viewModel.locations.addAll(result)
             initDefaultRV()
         })
-        viewModel.refreshLocations()
+        managerLocationActivity.viewModel.getLocations()
     }
 
     private fun initDefaultRV() {
         initDefaultLocations()
         val layoutManager1 = GridLayoutManager(context, 4)
         val layoutManager2 = GridLayoutManager(context, 4)
-        defaultCityAdapter = DefaultLocationAdapter(defaultCities, this)
-        defaultViewAdapter = DefaultLocationAdapter(defaultViews, this)
+        defaultCityAdapter = DefaultLocationAdapter(defaultCities, managerLocationActivity)
+        defaultViewAdapter = DefaultLocationAdapter(defaultViews, managerLocationActivity)
         defaultCitiesRV.layoutManager = layoutManager1
         defaultViewsRV.layoutManager = layoutManager2
         defaultCitiesRV.adapter = defaultCityAdapter
@@ -92,7 +96,7 @@ class AddLocationFragment : Fragment() {
     }
 
     private fun initDefaultLocations() {
-        val selected = viewModel.locations
+        val selected = managerLocationActivity.viewModel.locations
         defaultCities.forEach {
             it.isSelected = selected.contains(it)
         }
@@ -130,12 +134,13 @@ class AddLocationFragment : Fragment() {
         searchAdapter.onClickListener = {
             var position = 0
             val location = LocationItemBean(it.name, it.location.lng, it.location.lat)
-            if (!viewModel.locations.contains(location)) {
-                position = viewModel.locations.size
+            if (!managerLocationActivity.viewModel.locations.contains(location)) {
+                position = managerLocationActivity.viewModel.locations.size
                 location.position = position
-                viewModel.addLocation(location)
+                managerLocationActivity.viewModel.addLocation(location)
+                managerLocationActivity.viewModel.getLocationWeatherInfo(location)
             } else {
-                viewModel.locations.forEach here@{ item ->
+                managerLocationActivity.viewModel.locations.forEach here@{ item ->
                     if (item == location) {
                         position = item.position
                         return@here

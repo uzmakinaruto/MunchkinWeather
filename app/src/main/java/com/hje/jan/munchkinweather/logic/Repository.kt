@@ -28,7 +28,7 @@ object Repository {
         }
         emit(result)
     }
-    
+
     fun refreshWeather(lng: String, lat: String) = liveData(Dispatchers.IO) {
         val result = try {
             coroutineScope {
@@ -58,6 +58,59 @@ object Repository {
         emit(result)
     }
 
+    /*fun refreshLocationListInfo(locations: List<LocationItemBean>) = liveData {
+        val result = try {
+            val realTimes = mutableListOf<Deferred<RealtimeResponse>>()
+            coroutineScope {
+                for (index in 0..locations.size) {
+                    realTimes.add(async {
+                        MunchkinWeatherNetwork.getRealtimeResponse(
+                            locations[index].lng,
+                            locations[index].lat
+                        )
+                    })
+                }
+                for (index in 0..locations.size) {
+                    val response = realTimes[index].await()
+                    if (response.status == "ok") {
+                        locations[index].temp = response.result.realtime.temperature.toInt()
+                        locations[index].skyCon = response.result.realtime.skycon
+                        updateLocation(locations[index])
+                    }
+                }
+                Result.success(locations)
+            }
+        } catch (e: Exception) {
+            Result.failure<List<LocationItemBean>>(e)
+        }
+        emit(result)
+    }*/
+
+    /*fun getLocationItemWeatherInfo(location: LocationItemBean) = liveData {
+        val result = try {
+            val response = MunchkinWeatherNetwork.getRealtimeResponse(location.lng, location.lat)
+            if (response.status == "ok") {
+                location.temp = response.result.realtime.temperature.toInt()
+                location.skyCon = response.result.realtime.skycon
+                Result.success(location)
+            } else {
+                Result.failure(RuntimeException("status is not ok"))
+            }
+        } catch (e: Exception) {
+            Result.failure<LocationItemBean>(e)
+        }
+        emit(result)
+    }*/
+
+    suspend fun getLocationWeatherInfo(location: LocationItemBean) {
+        withContext(Dispatchers.IO) {
+            val response = MunchkinWeatherNetwork.getRealtimeResponse(location.lng, location.lat)
+            if (response.status == "ok") {
+                location.temp = response.result.realtime.temperature.toInt()
+                location.skyCon = response.result.realtime.skycon
+            }
+        }
+    }
 
     suspend fun addLocation(location: LocationItemBean) {
         withContext(Dispatchers.IO) {

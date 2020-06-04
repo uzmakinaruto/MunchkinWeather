@@ -3,6 +3,7 @@ package com.hje.jan.munchkinweather.logic.database
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.hje.jan.munchkinweather.logic.model.WeatherResponse
 import kotlinx.android.parcel.Parcelize
 
 @Entity

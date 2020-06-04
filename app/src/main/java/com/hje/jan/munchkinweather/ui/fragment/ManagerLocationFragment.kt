@@ -55,7 +55,7 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         super.onActivityCreated(savedInstanceState)
         managerLocationActivity = activity as ManagerLocationActivity
         toolbar.setNavigationOnClickListener {
-            if (viewModel.locations.size == 0) {
+            if (managerLocationActivity.viewModel.locations.size == 0) {
                 alert {
                     title = "请先添加一个城市"
                     okButton {
@@ -70,7 +70,10 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
     }
 
     private fun initRecyclerView() {
-        adapter = ManagerLocationAdapter(viewModel.locations, this)
+        adapter = ManagerLocationAdapter(
+            managerLocationActivity.viewModel.locations,
+            managerLocationActivity
+        )
         dragHelper = ItemTouchHelper(LocationMoveCallBack(adapter))
         adapter.setHelper(dragHelper)
         recyclerview.layoutManager =
@@ -95,9 +98,9 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
                 startLocation()
             }
         }
-        viewModel.selectLocations.observe(viewLifecycleOwner, Observer {
-            viewModel.locations.clear()
-            viewModel.locations.addAll(it)
+        managerLocationActivity.viewModel.locationsLiveData.observe(viewLifecycleOwner, Observer {
+            managerLocationActivity.viewModel.locations.clear()
+            managerLocationActivity.viewModel.locations.addAll(it)
             adapter.notifyDataSetChanged()
             recyclerview.post {
                 if (recyclerview.height > recyclerview.computeVerticalScrollRange()) {
@@ -110,15 +113,14 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
                 }
             }
         })
-        viewModel.refreshLocations()
-
+        managerLocationActivity.viewModel.getLocations()
     }
 
     override fun onPause() {
         super.onPause()
-        for ((index, location) in viewModel.locations.withIndex()) {
+        for ((index, location) in managerLocationActivity.viewModel.locations.withIndex()) {
             location.position = index
-            viewModel.updateLocation(location)
+            managerLocationActivity.viewModel.updateLocation(location)
         }
     }
 

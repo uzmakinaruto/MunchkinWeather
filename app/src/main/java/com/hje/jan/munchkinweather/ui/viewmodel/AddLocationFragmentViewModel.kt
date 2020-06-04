@@ -4,11 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.hje.jan.munchkinweather.logic.Repository
-import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 class AddLocationFragmentViewModel : ViewModel() {
 
@@ -24,32 +21,34 @@ class AddLocationFragmentViewModel : ViewModel() {
         _places.value = query
     }
 
-    /**选中的地址*/
+    /**选中的地址
     private val _selectedLocations = MutableLiveData<Unit>()
 
     val selectLocations = Transformations.switchMap(_selectedLocations) {
-        Repository.getLocations()
+    Repository.getLocations()
     }
 
     fun refreshLocations() {
-        _selectedLocations.value = _selectedLocations.value
+    _selectedLocations.value = _selectedLocations.value
     }
 
     val locations: MutableList<LocationItemBean> = mutableListOf()
 
-    /**添加地址到数据库*/
+     */
+    /**添加地址到数据库*//*
     fun addLocation(location: LocationItemBean) {
         CoroutineScope(job).launch {
             Repository.addLocation(location)
         }
     }
 
-    /**从数据库中删除地址*/
+    */
+    /**从数据库中删除地址*//*
     fun deleteLocation(name: String) {
         CoroutineScope(job).launch {
             Repository.deleteLocation(name)
         }
-    }
+    }*/
     
     /**释放协程*/
     override fun onCleared() {

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
-import com.hje.jan.munchkinweather.ui.fragment.ManagerLocationFragment
+import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import com.hje.jan.munchkinweather.ui.widget.LocationItemView
 import com.hje.jan.munchkinweather.util.AvoidDoubleClickUtil
 import kotlinx.android.synthetic.main.item_location.view.*
@@ -19,7 +19,7 @@ import java.util.*
 
 class ManagerLocationAdapter(
     private val locations: MutableList<LocationItemBean>,
-    private val fragment: ManagerLocationFragment
+    private val activity: ManagerLocationActivity
 ) :
     RecyclerView.Adapter<ManagerLocationAdapter.ViewHolder>() {
 
@@ -75,7 +75,7 @@ class ManagerLocationAdapter(
                 itemView.removeLocation.setOnClickListener {
                     if (AvoidDoubleClickUtil.isClickable()) {
                        // locations.removeAt(holder.adapterPosition - 1)
-                        fragment.viewModel.deleteLocation(locations[holder.adapterPosition - 1].name)
+                        activity.viewModel.deleteLocation(locations[holder.adapterPosition - 1].name)
                     }
                 }
                 itemView.thumb.setOnTouchListener { v, event ->
