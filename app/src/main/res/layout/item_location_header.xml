@@ -14,6 +14,7 @@
         android:visibility="invisible" />
 
     <ImageView
+        android:id="@+id/skyConImage"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginLeft="8dp"
@@ -58,9 +59,10 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:id="@+id/location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="东莞市"
+                android:text="显示定位"
                 android:textColor="@android:color/black" />
 
             <ImageView
@@ -71,17 +73,21 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/weatherLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp">
+            android:layout_marginTop="4dp"
+            android:visibility="gone">
 
             <TextView
+                android:id="@+id/skyConText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="阴"
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/tempText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"

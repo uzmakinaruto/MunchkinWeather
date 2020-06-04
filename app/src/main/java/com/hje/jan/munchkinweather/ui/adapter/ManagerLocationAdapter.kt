@@ -1,6 +1,5 @@
 package com.hje.jan.munchkinweather.ui.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -10,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.ui.fragment.ManagerLocationFragment
-import com.hje.jan.munchkinweather.ui.widget.LocationHeaderView
 import com.hje.jan.munchkinweather.ui.widget.LocationItemView
 import com.hje.jan.munchkinweather.util.AvoidDoubleClickUtil
 import kotlinx.android.synthetic.main.item_location.view.*
@@ -27,7 +25,7 @@ class ManagerLocationAdapter(
 
     private var helper: ItemTouchHelper? = null
     var addLocationListener: (() -> Unit)? = null
-
+    var startLocationListener: (() -> Unit)? = null
     companion object {
         private const val TYPE_HEADER = 0
         private const val TYPE_ITEMS = 1
@@ -40,10 +38,18 @@ class ManagerLocationAdapter(
         val holder: ViewHolder
         when (viewType) {
             TYPE_HEADER -> {
-                val header = LocationHeaderView(parent.context)
+                val header = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_location_header, parent, false)
                 holder = ViewHolder(header)
                 header.locateSwitch.setOnCheckedChangeListener { _, isChecked ->
-                    Log.d("ManagerLocation", "isChecked $isChecked")
+                    if (isChecked) {
+                        startLocationListener?.invoke()
+                        header.weatherLayout.visibility = View.VISIBLE
+                        header.location.text = "东莞市"
+                    } else {
+                        header.weatherLayout.visibility = View.GONE
+                        header.location.text = "显示定位"
+                    }
                 }
             }
             TYPE_FOOTER -> {

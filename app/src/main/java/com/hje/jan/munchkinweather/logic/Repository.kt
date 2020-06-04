@@ -28,7 +28,7 @@ object Repository {
         }
         emit(result)
     }
-
+    
     fun refreshWeather(lng: String, lat: String) = liveData(Dispatchers.IO) {
         val result = try {
             coroutineScope {
@@ -57,6 +57,7 @@ object Repository {
         }
         emit(result)
     }
+
 
     suspend fun addLocation(location: LocationItemBean) {
         withContext(Dispatchers.IO) {
