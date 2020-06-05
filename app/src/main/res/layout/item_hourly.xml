@@ -20,6 +20,7 @@
             android:textSize="12sp" />
 
         <TextView
+            android:id="@+id/degree"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/tempText"

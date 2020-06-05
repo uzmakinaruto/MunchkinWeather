@@ -2,6 +2,8 @@ package com.hje.jan.munchkinweather.ui.fragment
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -31,7 +33,9 @@ import kotlinx.android.synthetic.main.fragment_weather.*
 import kotlinx.android.synthetic.main.section_weather_detail.*
 import kotlinx.android.synthetic.main.section_weather_forecast.*
 import kotlinx.android.synthetic.main.titlebar_weather.*
+import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.textColorResource
 import java.util.*
 
 
@@ -196,6 +200,8 @@ class WeatherFragment : Fragment() {
         }
         viewModel.realtimeResult?.let {
             weatherInfo.visibility = View.VISIBLE
+            setSkyConColor(it.skycon)
+            degree.imageResource = WeatherUtil.getDegreeColor(it.skycon)
             skyConText.text = WeatherUtil.getSkyConDescription(it.skycon)
             tempText.text = it.temperature.toInt().toString()
             aqiStatus.text = it.airQuality.description.chn
@@ -261,5 +267,30 @@ class WeatherFragment : Fragment() {
         if (isShowTitleBarBg) titleBar.setBackgroundColor(Color.WHITE)
         else titleBar.setBackgroundColor(Color.TRANSPARENT)
         Log.d(TAG, "${viewModel.location.name}isShowTitleBarBg =${isShowTitleBarBg}")
+    }
+
+    private fun setSkyConColor(skyCon: String) {
+        tempText.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
+        skyConText.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
+        divider.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
+        aqiStatus.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
+        aqiValue.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
+        right.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
+        yesterdayDiff.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
+    }
+
+    private fun setTextViewSkyConColor(textView: TextView, skyCon: String) {
+        val colors = WeatherUtil.getSkyConColor(skyCon)
+        val linearGradient = LinearGradient(
+            0f,
+            0f,
+            0f,
+            textView.paint.textSize,
+            resources.getColor(colors.first),
+            resources.getColor(colors.second),
+            Shader.TileMode.CLAMP
+        )
+        textView.paint.shader = linearGradient
+        textView.invalidate()
     }
 }

@@ -287,4 +287,48 @@ object WeatherUtil {
             else -> throw RuntimeException("Unknown day of week")
         }
     }
+
+    fun getSkyConColor(skyCon: String): Pair<Int, Int> {
+        return when (skyCon) {
+            "CLEAR_DAY", "CLEAR_NIGHT" -> Pair(R.color.color_sunny_start, R.color.color_sunny_end)
+            "PARTLY_CLOUDY_DAY", "PARTLY_CLOUDY_NIGHT", "CLOUDY", "WIND" -> Pair(
+                R.color.color_cloudy_start,
+                R.color.color_cloudy_end
+            )
+            "LIGHT_HAZE", "MODERATE_HAZE", "HEAVY_HAZE" -> Pair(
+                R.color.color_cloudy_start,
+                R.color.color_cloudy_end
+            )
+            "LIGHT_RAIN", "MODERATE_RAIN", "HEAVY_RAIN", "STORM_RAIN" -> Pair(
+                R.color.color_rain_start,
+                R.color.color_rain_end
+            )
+            "FOG" -> Pair(R.color.color_sunny_start, R.color.color_sunny_end)
+            "LIGHT_SNOW", "MODERATE_SNOW", "HEAVY_SNOW", "STORM_SNOW" -> Pair(
+                R.color.color_rain_start,
+                R.color.color_rain_end
+            )
+            "DUST", "SAND" -> Pair(
+                R.color.color_rain_start,
+                R.color.color_rain_end
+            )
+            else -> Pair(
+                R.color.color_rain_start,
+                R.color.color_rain_end
+            )
+        }
+    }
+
+    fun getDegreeColor(skyCon: String): Int {
+        return when (skyCon) {
+            "CLEAR_DAY", "CLEAR_NIGHT" -> R.drawable.shape_degree_sunny
+            "PARTLY_CLOUDY_DAY", "PARTLY_CLOUDY_NIGHT", "CLOUDY", "WIND" -> R.drawable.shape_degree_cloudy
+            "LIGHT_HAZE", "MODERATE_HAZE", "HEAVY_HAZE" -> R.drawable.shape_degree_rain
+            "LIGHT_RAIN", "MODERATE_RAIN", "HEAVY_RAIN", "STORM_RAIN" -> R.drawable.shape_degree_rain
+            "FOG" -> R.drawable.shape_degree_rain
+            "LIGHT_SNOW", "MODERATE_SNOW", "HEAVY_SNOW", "STORM_SNOW" -> R.drawable.shape_degree_cloudy
+            "DUST", "SAND" -> R.drawable.shape_degree_rain
+            else -> R.drawable.shape_degree_rain
+        }
+    }
 }

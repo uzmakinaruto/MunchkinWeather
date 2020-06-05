@@ -4,5 +4,5 @@
 
     <stroke
         android:width="4dp"
-        android:color="#707070" />
+        android:color="@color/color_rain_start" />
 </shape>
