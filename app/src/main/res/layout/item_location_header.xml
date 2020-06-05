@@ -14,7 +14,7 @@
         android:visibility="invisible" />
 
     <ImageView
-        android:id="@+id/skyConImage"
+        android:id="@+id/scImage"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginLeft="8dp"
@@ -80,14 +80,14 @@
             android:visibility="gone">
 
             <TextView
-                android:id="@+id/skyConText"
+                android:id="@+id/scText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="阴"
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/tempText"
+                android:id="@+id/temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"

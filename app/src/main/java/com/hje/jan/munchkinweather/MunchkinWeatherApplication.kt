@@ -2,6 +2,7 @@ package com.hje.jan.munchkinweather
 
 import android.app.Application
 import android.content.Context
+import com.hje.jan.munchkinweather.logic.Repository
 
 class MunchkinWeatherApplication : Application() {
 
@@ -15,4 +16,6 @@ class MunchkinWeatherApplication : Application() {
         super.onCreate()
         context = applicationContext
     }
+
+
 }

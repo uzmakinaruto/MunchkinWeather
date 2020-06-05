@@ -46,14 +46,16 @@ class WeatherActivity : AppCompatActivity() {
                 startActivity<ManagerLocationActivity>()
             } else {
                 viewModel.locations.clear()
-                viewModel.locations.addAll(locations)
                 viewModel.fragments.clear()
-                for (location in viewModel.locations) {
-                    val fragment = WeatherFragment.newInstance(location)
-                    viewModel.fragments.add(fragment)
+                for (location in locations) {
+                    if (!location.isLocate || (location.isLocate && location.isLocateEnable)) {
+                        viewModel.locations.add(location)
+                        val fragment = WeatherFragment.newInstance(location)
+                        viewModel.fragments.add(fragment)
+                    }
                 }
                 viewPager.adapter?.notifyDataSetChanged()
-                locationText.text = locations[viewPager.currentItem].name
+                locationText.text = viewModel.locations[viewPager.currentItem].name
                 viewPager.currentItem = viewModel.currentItem
                 pageIndicatorView.selection = viewModel.currentItem
 
@@ -140,7 +142,9 @@ class WeatherActivity : AppCompatActivity() {
             videoView.pause()
         }
         videoView.setBackgroundColor(Color.WHITE)
-        viewModel.currentPosition = viewModel.fragments[viewPager.currentItem].getCurrentPosition()
+        if (viewModel.locations.size > 0)
+            viewModel.currentPosition =
+                viewModel.fragments[viewPager.currentItem].getCurrentPosition()
     }
 
     override fun onDestroy() {

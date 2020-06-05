@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +19,7 @@ import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationListener
 import com.hje.jan.munchkinweather.MunchkinWeatherApplication
 import com.hje.jan.munchkinweather.R
+import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import com.hje.jan.munchkinweather.ui.adapter.LocationMoveCallBack
 import com.hje.jan.munchkinweather.ui.adapter.ManagerLocationAdapter
@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.fragment_manager_location.*
 import kotlinx.android.synthetic.main.item_location_footer.*
 import org.jetbrains.anko.okButton
 import org.jetbrains.anko.support.v4.alert
+import org.jetbrains.anko.support.v4.toast
 
 class ManagerLocationFragment : Fragment(), AMapLocationListener {
 
@@ -98,9 +99,25 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
                 startLocation()
             }
         }
-        managerLocationActivity.viewModel.locationsLiveData.observe(viewLifecycleOwner, Observer {
+        managerLocationActivity.viewModel.isLocate.observe(
+            viewLifecycleOwner,
+            Observer { result ->
+                progressBar.visibility = View.GONE
+                if (!result) {
+                    toast("请求天气失败,请检查网络是否开启")
+                }
+                managerLocationActivity.viewModel.getLocations()
+            })
+        managerLocationActivity.viewModel.locationsLiveData.observe(
+            viewLifecycleOwner,
+            Observer { locations ->
             managerLocationActivity.viewModel.locations.clear()
-            managerLocationActivity.viewModel.locations.addAll(it)
+                managerLocationActivity.viewModel.locations.addAll(locations)
+                if (locations.isEmpty()) {
+                    val defaultLocateLocation = LocationItemBean("", "", "", isLocate = true)
+                    managerLocationActivity.viewModel.locations.add(defaultLocateLocation)
+                    managerLocationActivity.viewModel.addLocation(defaultLocateLocation)
+                }
             adapter.notifyDataSetChanged()
             recyclerview.post {
                 if (recyclerview.height > recyclerview.computeVerticalScrollRange()) {
@@ -117,10 +134,19 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
     }
 
     override fun onPause() {
-        super.onPause()
+        super.onPause()/*
         for ((index, location) in managerLocationActivity.viewModel.locations.withIndex()) {
             location.position = index
             managerLocationActivity.viewModel.updateLocation(location)
+        }*/
+        /**只有两个以上地址才进行交换*/
+        if (managerLocationActivity.viewModel.locations.size > 2) {
+            /**定位地址不能交换*/
+            for (index in 1 until managerLocationActivity.viewModel.locations.size) {
+                val location = managerLocationActivity.viewModel.locations[index]
+                location.position = index
+                managerLocationActivity.viewModel.updateLocation(location)
+            }
         }
     }
 
@@ -141,11 +167,23 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
             }
         }
         locationClient?.startLocation()
+        progressBar.visibility = View.VISIBLE
     }
 
     override fun onLocationChanged(aMapLocation: AMapLocation?) {
+        progressBar.visibility = View.GONE
         if (aMapLocation != null && aMapLocation.errorCode == 0) {
-            Log.d(TAG, aMapLocation.toStr())
+            /**
+             * 查找数据库,看之前是否有定位数据
+             * 无定位数据,创建新的定位数据
+             * 有定位数据,更新定位信息
+             * 查询天气状况
+             * 保存都数据库
+             * 刷新界面
+             * */
+            managerLocationActivity.viewModel.setLocateLocation(aMapLocation)
+        } else {
+            toast("定位失败,请检查网络与定位开关")
         }
         locationClient?.stopLocation()
     }

@@ -12,7 +12,7 @@ import org.jetbrains.anko.imageResource
 
 class HourlyItemView : RelativeLayout {
     fun bindData(hourlyResult: HourlyResponse.Hourly, position: Int) {
-        tempText.text = "${hourlyResult.temperature[position].value.toInt()}°"
+        tempText.text = "${hourlyResult.temperature[position].value.toInt()}"
         skyConText.text = WeatherUtil.getSkyConDescription(hourlyResult.skyCon[position].value)
         val timeString =
             hourlyResult.temperature[position].datetime

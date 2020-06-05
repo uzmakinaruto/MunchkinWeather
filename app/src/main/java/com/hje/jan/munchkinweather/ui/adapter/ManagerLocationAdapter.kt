@@ -11,9 +11,11 @@ import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import com.hje.jan.munchkinweather.ui.widget.LocationItemView
 import com.hje.jan.munchkinweather.util.AvoidDoubleClickUtil
+import com.hje.jan.munchkinweather.util.WeatherUtil
 import kotlinx.android.synthetic.main.item_location.view.*
 import kotlinx.android.synthetic.main.item_location_footer.view.*
 import kotlinx.android.synthetic.main.item_location_header.view.*
+import org.jetbrains.anko.imageResource
 import java.util.*
 
 
@@ -41,14 +43,14 @@ class ManagerLocationAdapter(
                 val header = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_location_header, parent, false)
                 holder = ViewHolder(header)
-                header.locateSwitch.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
+                header.locateSwitch.setOnClickListener {
+                    if (header.locateSwitch.isChecked) {
+                        header.locateSwitch.isChecked = false
                         startLocationListener?.invoke()
-                        header.weatherLayout.visibility = View.VISIBLE
-                        header.location.text = "东莞市"
                     } else {
-                        header.weatherLayout.visibility = View.GONE
-                        header.location.text = "显示定位"
+                        locations[0].isLocateEnable = false
+                        activity.viewModel.updateLocation(locations[0])
+                        notifyDataSetChanged()
                     }
                 }
             }
@@ -74,8 +76,9 @@ class ManagerLocationAdapter(
                 holder = ViewHolder(itemView)
                 itemView.removeLocation.setOnClickListener {
                     if (AvoidDoubleClickUtil.isClickable()) {
-                       // locations.removeAt(holder.adapterPosition - 1)
                         activity.viewModel.deleteLocation(locations[holder.adapterPosition - 1].name)
+                        locations.removeAt(holder.adapterPosition - 1)
+                        notifyDataSetChanged()
                     }
                 }
                 itemView.thumb.setOnTouchListener { v, event ->
@@ -92,26 +95,45 @@ class ManagerLocationAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (position) {
             0 -> TYPE_HEADER
-            locations.size + 1 -> TYPE_FOOTER
+            locations.size -> TYPE_FOOTER
             else -> TYPE_ITEMS
         }
     }
 
-    override fun getItemCount() = locations.size + 2
+    override fun getItemCount() = locations.size + 1
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (getItemViewType(position) == TYPE_ITEMS) {
-            val location = locations[position - 1]
-            (holder.itemView as LocationItemView).bindData(location)
+        if (locations.size > 0) {
+            if (getItemViewType(position) == TYPE_ITEMS) {
+                val location = locations[position]
+                (holder.itemView as LocationItemView).bindData(location)
+            } else if (getItemViewType(position) == TYPE_HEADER) {
+                val location = locations[position]
+                val header = holder.itemView
+                if (location.isLocateEnable) {
+                    header.weatherLayout.visibility = View.VISIBLE
+                    header.location.text = location.name
+                    header.temp.text = "${location.temp}℃"
+                    header.scText.text = WeatherUtil.getSkyConDescription(location.skyCon)
+                    header.scImage.imageResource = WeatherUtil.getSkyConImage(location.skyCon)
+                    header.locateSwitch.isChecked = true
+                } else {
+                    header.weatherLayout.visibility = View.GONE
+                    header.location.text = "显示定位"
+                    header.scImage.imageResource = R.drawable.ic_week_na
+                    header.locateSwitch.isChecked = false
+                }
+            }
         }
     }
 
     fun onMove(fromPosition: Int, toPosition: Int) {
-        Collections.swap(locations, fromPosition - 1, toPosition - 1)
+        Collections.swap(locations, fromPosition, toPosition)
         notifyItemMoved(fromPosition, toPosition)
     }
 
     fun setHelper(helper: ItemTouchHelper) {
         this.helper = helper
     }
+
 }
