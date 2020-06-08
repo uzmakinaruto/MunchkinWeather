@@ -76,8 +76,8 @@ class ManagerLocationAdapter(
                 holder = ViewHolder(itemView)
                 itemView.removeLocation.setOnClickListener {
                     if (AvoidDoubleClickUtil.isClickable()) {
-                        activity.viewModel.deleteLocation(locations[holder.adapterPosition - 1].name)
-                        locations.removeAt(holder.adapterPosition - 1)
+                        activity.viewModel.deleteLocation(locations[holder.adapterPosition].name)
+                        locations.removeAt(holder.adapterPosition)
                         notifyDataSetChanged()
                     }
                 }

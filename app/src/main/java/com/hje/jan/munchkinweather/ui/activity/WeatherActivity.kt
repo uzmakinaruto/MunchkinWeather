@@ -42,7 +42,7 @@ class WeatherActivity : AppCompatActivity() {
     private fun initViewPager() {
         viewModel.selectLocations.observe(this, Observer { locations ->
             /**启动若没有记录的地址,跳到ManagerLocationActivity*/
-            if (locations.size == 0) {
+            if (locations.size == 0 || (locations.size == 1 && !locations[0].isLocateEnable)) {
                 startActivity<ManagerLocationActivity>()
             } else {
                 viewModel.locations.clear()
@@ -79,6 +79,7 @@ class WeatherActivity : AppCompatActivity() {
                     }
                 }
             }
+
             override fun onPageScrolled(
                 position: Int,
                 positionOffset: Float,

@@ -2,15 +2,15 @@ package com.hje.jan.munchkinweather.ui.fragment
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.DisplayMetrics
+import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,11 +23,10 @@ import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import com.hje.jan.munchkinweather.ui.adapter.LocationMoveCallBack
 import com.hje.jan.munchkinweather.ui.adapter.ManagerLocationAdapter
-import com.hje.jan.munchkinweather.ui.viewmodel.ManagerLocationFragmentViewModel
+import kotlinx.android.synthetic.main.alert_dialog_add_location.view.*
 import kotlinx.android.synthetic.main.fragment_manager_location.*
 import kotlinx.android.synthetic.main.item_location_footer.*
-import org.jetbrains.anko.okButton
-import org.jetbrains.anko.support.v4.alert
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.support.v4.toast
 
 class ManagerLocationFragment : Fragment(), AMapLocationListener {
@@ -35,8 +34,15 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
     lateinit var adapter: ManagerLocationAdapter
     lateinit var dragHelper: ItemTouchHelper
     lateinit var managerLocationActivity: ManagerLocationActivity
-    val viewModel by lazy { ViewModelProvider(this).get(ManagerLocationFragmentViewModel::class.java) }
+    //val viewModel by lazy { ViewModelProvider(this).get(ManagerLocationFragmentViewModel::class.java) }
     var locationClient: AMapLocationClient? = null
+    var locatingDialog: AlertDialog? = null
+    val dialogWidth by lazy {
+        val metrics = DisplayMetrics()
+        managerLocationActivity.windowManager.defaultDisplay.getMetrics(metrics)
+        (metrics.widthPixels * 0.5).toInt()
+    }
+
     companion object {
         const val TAG = "ManagerLocationFragment"
         fun newInstance(): ManagerLocationFragment {
@@ -56,13 +62,9 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         super.onActivityCreated(savedInstanceState)
         managerLocationActivity = activity as ManagerLocationActivity
         toolbar.setNavigationOnClickListener {
-            if (managerLocationActivity.viewModel.locations.size == 0) {
-                alert {
-                    title = "请先添加一个城市"
-                    okButton {
-                        "确定"
-                    }
-                }.show()
+            if (managerLocationActivity.viewModel.locations.size == 0 || (managerLocationActivity.viewModel.locations.size == 1 && !managerLocationActivity.viewModel.locations[0].isLocateEnable)
+            ) {
+                showAddLocationDialog()
             } else {
                 managerLocationActivity.finish()
             }
@@ -102,7 +104,7 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         managerLocationActivity.viewModel.isLocate.observe(
             viewLifecycleOwner,
             Observer { result ->
-                progressBar.visibility = View.GONE
+                locatingDialog?.dismiss()
                 if (!result) {
                     toast("请求天气失败,请检查网络是否开启")
                 }
@@ -111,25 +113,25 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         managerLocationActivity.viewModel.locationsLiveData.observe(
             viewLifecycleOwner,
             Observer { locations ->
-            managerLocationActivity.viewModel.locations.clear()
+                managerLocationActivity.viewModel.locations.clear()
                 managerLocationActivity.viewModel.locations.addAll(locations)
                 if (locations.isEmpty()) {
                     val defaultLocateLocation = LocationItemBean("", "", "", isLocate = true)
                     managerLocationActivity.viewModel.locations.add(defaultLocateLocation)
                     managerLocationActivity.viewModel.addLocation(defaultLocateLocation)
                 }
-            adapter.notifyDataSetChanged()
-            recyclerview.post {
-                if (recyclerview.height > recyclerview.computeVerticalScrollRange()) {
-                    footer.visibility = View.GONE
-                } else {
-                    footer.visibility = View.VISIBLE
-                    addLocation.setOnClickListener {
-                        managerLocationActivity.startAddLocation()
+                adapter.notifyDataSetChanged()
+                recyclerview.post {
+                    if (recyclerview.height > recyclerview.computeVerticalScrollRange()) {
+                        footer.visibility = View.GONE
+                    } else {
+                        footer.visibility = View.VISIBLE
+                        addLocation.setOnClickListener {
+                            managerLocationActivity.startAddLocation()
+                        }
                     }
                 }
-            }
-        })
+            })
         managerLocationActivity.viewModel.getLocations()
     }
 
@@ -167,24 +169,50 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
             }
         }
         locationClient?.startLocation()
-        progressBar.visibility = View.VISIBLE
+        showLocatingDialog()
     }
 
     override fun onLocationChanged(aMapLocation: AMapLocation?) {
-        progressBar.visibility = View.GONE
+        locatingDialog?.dismiss()
         if (aMapLocation != null && aMapLocation.errorCode == 0) {
-            /**
-             * 查找数据库,看之前是否有定位数据
-             * 无定位数据,创建新的定位数据
-             * 有定位数据,更新定位信息
-             * 查询天气状况
-             * 保存都数据库
-             * 刷新界面
-             * */
             managerLocationActivity.viewModel.setLocateLocation(aMapLocation)
         } else {
             toast("定位失败,请检查网络与定位开关")
         }
         locationClient?.stopLocation()
+    }
+
+
+    /**设置对话框宽高、位置等属性需要在对话框show后才能设置*/
+    private fun showAddLocationDialog() {
+        val root = View.inflate(managerLocationActivity, R.layout.alert_dialog_add_location, null)
+        val dialog =
+            AlertDialog.Builder(managerLocationActivity)
+                .setView(root).setCancelable(false).create()
+        root.okBtn.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+        val params = dialog.window?.attributes
+        params?.y = 150
+        params?.gravity = Gravity.BOTTOM
+        dialog.window?.attributes = params
+        dialog.window?.decorView?.backgroundColor = Color.TRANSPARENT
+    }
+
+    private fun showLocatingDialog() {
+        if (null == locatingDialog) {
+            val root =
+                View.inflate(managerLocationActivity, R.layout.alery_dialog_locate, null)
+            locatingDialog =
+                AlertDialog.Builder(managerLocationActivity)
+                    .setView(root).setCancelable(false).show()
+            locatingDialog?.let {
+                val params = it.window?.attributes
+                params?.width = dialogWidth
+                it.window?.attributes = params
+                it.window?.decorView?.backgroundColor = Color.TRANSPARENT
+            }
+        } else {
+            locatingDialog?.show()
+        }
     }
 }

@@ -80,6 +80,7 @@ object Repository {
     fun addDefaultLocateLocation() {
 
     }
+
     fun getLocations() = liveData(Dispatchers.IO) {
         emit(locationDao.getLocations())
     }
