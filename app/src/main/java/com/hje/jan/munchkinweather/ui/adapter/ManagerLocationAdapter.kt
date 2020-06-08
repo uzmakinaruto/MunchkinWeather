@@ -28,6 +28,7 @@ class ManagerLocationAdapter(
     private var helper: ItemTouchHelper? = null
     var addLocationListener: (() -> Unit)? = null
     var startLocationListener: (() -> Unit)? = null
+    var deleteLocationListener:(()->Unit)? = null
     companion object {
         private const val TYPE_HEADER = 0
         private const val TYPE_ITEMS = 1
@@ -79,6 +80,7 @@ class ManagerLocationAdapter(
                         activity.viewModel.deleteLocation(locations[holder.adapterPosition].name)
                         locations.removeAt(holder.adapterPosition)
                         notifyDataSetChanged()
+                        deleteLocationListener?.invoke()
                     }
                 }
                 itemView.thumb.setOnTouchListener { v, event ->

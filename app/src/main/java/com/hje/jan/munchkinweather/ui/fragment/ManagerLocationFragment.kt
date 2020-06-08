@@ -27,6 +27,7 @@ import kotlinx.android.synthetic.main.alert_dialog_add_location.view.*
 import kotlinx.android.synthetic.main.fragment_manager_location.*
 import kotlinx.android.synthetic.main.item_location_footer.*
 import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.support.v4.toast
 
 class ManagerLocationFragment : Fragment(), AMapLocationListener {
@@ -37,7 +38,7 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
     //val viewModel by lazy { ViewModelProvider(this).get(ManagerLocationFragmentViewModel::class.java) }
     var locationClient: AMapLocationClient? = null
     var locatingDialog: AlertDialog? = null
-    val dialogWidth by lazy {
+    private val dialogWidth by lazy {
         val metrics = DisplayMetrics()
         managerLocationActivity.windowManager.defaultDisplay.getMetrics(metrics)
         (metrics.widthPixels * 0.5).toInt()
@@ -85,6 +86,15 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         dragHelper.attachToRecyclerView(recyclerview)
         adapter.addLocationListener = {
             managerLocationActivity.startAddLocation()
+        }
+        adapter.deleteLocationListener = {
+            recyclerview.post {
+                if (recyclerview.height > recyclerview.computeVerticalScrollRange()) {
+                    footer.visibility = View.GONE
+                } else {
+                    footer.visibility = View.VISIBLE
+                }
+            }
         }
         adapter.startLocationListener = {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -178,6 +188,9 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
             managerLocationActivity.viewModel.setLocateLocation(aMapLocation)
         } else {
             toast("定位失败,请检查网络与定位开关")
+            alert {
+                message = "${aMapLocation?.errorInfo}  errCode = ${aMapLocation?.errorCode}"
+            }.show()
         }
         locationClient?.stopLocation()
     }

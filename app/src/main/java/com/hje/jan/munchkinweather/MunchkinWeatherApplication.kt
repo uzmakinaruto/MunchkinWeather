@@ -16,6 +16,4 @@ class MunchkinWeatherApplication : Application() {
         super.onCreate()
         context = applicationContext
     }
-
-
 }
