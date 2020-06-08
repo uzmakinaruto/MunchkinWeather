@@ -57,6 +57,11 @@ class WeatherActivity : AppCompatActivity() {
                 viewPager.adapter?.notifyDataSetChanged()
                 locationText.text = viewModel.locations[viewPager.currentItem].name
                 viewPager.currentItem = viewModel.currentItem
+                if(locations[0].isLocateEnable){
+                    pageIndicatorView.setIsLocateEnable(true)
+                }else{
+                    pageIndicatorView.setIsLocateEnable(false)
+                }
                 pageIndicatorView.selection = viewModel.currentItem
 
             }

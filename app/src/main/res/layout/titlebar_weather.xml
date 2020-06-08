@@ -27,10 +27,10 @@
                 android:id="@+id/locationText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
                 android:ellipsize="end"
                 android:maxWidth="200dp"
                 android:singleLine="true"
+                android:text=""
                 android:textColor="@android:color/black"
                 android:textSize="20sp" />
 
@@ -50,12 +50,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            app:piv_dynamicCount="true"
+            app:piv_interactiveAnimation="true"
             app:piv_radius="2dp"
             app:piv_selectedColor="#707070"
             app:piv_unselectedColor="#cdcdcd"
-            app:piv_viewPager="@id/viewPager"
-            app:piv_dynamicCount="true"
-            app:piv_interactiveAnimation="true"/>
+            app:piv_viewPager="@id/viewPager" />
     </LinearLayout>
 
     <ImageButton
