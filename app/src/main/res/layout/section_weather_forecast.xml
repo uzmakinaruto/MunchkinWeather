@@ -23,6 +23,8 @@
         android:background="@color/divider" />
 
     <LinearLayout
+        android:id="@+id/gotoForecast"
+        android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -33,15 +35,24 @@
         android:paddingBottom="12dp">
 
         <TextView
+            android:id="@+id/forecastText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="未来15天天气"
             android:textSize="16sp" />
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_right" />
+        <!--<ImageView
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:src="@drawable/ic_right"/>-->
+
+        <TextView
+            android:id="@+id/forecastRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text=">"
+            android:textStyle="bold"/>
     </LinearLayout>
 </LinearLayout>

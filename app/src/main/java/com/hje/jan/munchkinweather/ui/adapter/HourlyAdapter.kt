@@ -20,8 +20,15 @@ class HourlyAdapter(private var hourlyResult: HourlyResponse.Hourly?) :
 
     override fun getItemCount(): Int {
         /**显示未来24小时预报*/
-        return if (null == hourlyResult) 0
-        else 24
+        return when {
+            null == hourlyResult -> 0
+            hourlyResult?.temperature?.size!! > 24 -> {
+                return 24
+            }
+            else -> {
+                return hourlyResult?.temperature?.size!!
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

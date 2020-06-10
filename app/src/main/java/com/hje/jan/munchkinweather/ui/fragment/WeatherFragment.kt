@@ -2,8 +2,6 @@ package com.hje.jan.munchkinweather.ui.fragment
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.LinearGradient
-import android.graphics.Shader
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -12,8 +10,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.VideoView
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -21,8 +17,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hje.jan.munchkinweather.R
-import com.hje.jan.munchkinweather.extension.dp2px
+import com.hje.jan.munchkinweather.extension.dp
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
+import com.hje.jan.munchkinweather.ui.activity.ForecastActivity
 import com.hje.jan.munchkinweather.ui.activity.WeatherActivity
 import com.hje.jan.munchkinweather.ui.adapter.DailyAdapter
 import com.hje.jan.munchkinweather.ui.adapter.HourlyAdapter
@@ -34,23 +31,20 @@ import kotlinx.android.synthetic.main.section_weather_detail.*
 import kotlinx.android.synthetic.main.section_weather_forecast.*
 import kotlinx.android.synthetic.main.titlebar_weather.*
 import org.jetbrains.anko.imageResource
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.support.v4.toast
 import org.jetbrains.anko.textColorResource
 import java.util.*
 
 
 class WeatherFragment : Fragment() {
-    var scrollToShowTitleBarDistance = 0
-    lateinit var titleBar: View
-    lateinit var titleBarTempText: TextView
-    lateinit var videoView: VideoView
     lateinit var hourlyAdapter: HourlyAdapter
     lateinit var dailyAdapter: DailyAdapter
     private val viewModel by lazy { ViewModelProvider(this).get(WeatherFragmentViewModel::class.java) }
     lateinit var weatherActivity: WeatherActivity
     companion object {
         val TAG = "WeatherFragment"
-        val SCROLL_TO_TOP = (300 + 16).dp2px()
+        val SCROLL_TO_TOP = (200 + 20).dp()
         fun newInstance(location: LocationItemBean): WeatherFragment {
             val fragment = WeatherFragment()
             fragment.arguments = Bundle().apply {
@@ -112,46 +106,41 @@ class WeatherFragment : Fragment() {
         Log.d(TAG, "onDetach-${viewModel.location.name}")
     }
 
-    private fun initActivityView() {
-        titleBarTempText = weatherActivity.titleBarTempText
-        titleBar = weatherActivity.titleBar
-        titleBar.viewTreeObserver.addOnGlobalLayoutListener {
-            scrollToShowTitleBarDistance = SCROLL_TO_TOP - titleBar.height
-        }
-        videoView = weatherActivity.videoView
-    }
-
     private fun scrollHandler(scrollY: Int) {
         if (weatherActivity.isCurrentFragment(this)) {
             /**activity上的UI变化 只有此fragment为当前fragment时才更新*/
-            showTitleBar(scrollY)
-            videoView.translationY = -scrollY.toFloat() / 2
-            if (scrollY > scrollToShowTitleBarDistance) {
-                val diff2 = scrollY - (SCROLL_TO_TOP - titleBar.height)
-                var tempPercentage = diff2.toFloat() / titleBar.height
+            //showTitleBar(scrollY)
+            if (scrollY >= SCROLL_TO_TOP) {
+                weatherActivity.titleBar.setBackgroundColor(Color.WHITE)
+                weatherActivity.titleDivider.visibility = View.VISIBLE
+                var tempPercentage = (scrollY - SCROLL_TO_TOP).toFloat() / weatherActivity.titleBar.height
                 if (tempPercentage >= 1) tempPercentage = 1f
-                titleBarTempText.alpha = tempPercentage
-                titleBarTempText.translationX = 100 * (1 - tempPercentage)
+                weatherActivity.titleBarTempText.alpha = tempPercentage
+                weatherActivity.titleBarTempText.translationX = 100 * (1 - tempPercentage)
             } else {
-                titleBarTempText.alpha = 0f
+                weatherActivity.titleBar.setBackgroundColor(Color.TRANSPARENT)
+                weatherActivity.titleDivider.visibility = View.GONE
+                weatherActivity.titleBarTempText.alpha = 0f
             }
+            weatherActivity.videoView.translationY = -scrollY.toFloat() / 2
+            var alphaPercentage = scrollY.toFloat() / SCROLL_TO_TOP
+            if (alphaPercentage > 1f) alphaPercentage = 1f
+            weatherActivity.viewModel.clapBoardAlpha = alphaPercentage
+            weatherActivity.clapBoard.alpha = weatherActivity.viewModel.clapBoardAlpha
+            Log.d(TAG, "scrollY:${scrollY}")
+            weatherActivity.viewModel.currentPosition = scrollY
         }
-        var diff1 = scrollY.toFloat() / SCROLL_TO_TOP
-        if (diff1 > 1f) diff1 = 1f
-        weatherInfo.setBackgroundColor((((diff1 * 0xFF).toInt() shl 24) or 0x00FFFFFF))
-        Log.d(TAG, "scrollY:${scrollY}")
-        weatherActivity.viewModel.currentPosition = scrollY
     }
 
     private fun weatherUiInit() {
         /**默认字体太粗 换一个字体*/
         tempText.typeface = Typeface.createFromAsset(activity!!.assets, "msyhl.ttc")
-        initActivityView()
         scrollView.setOnScrollChangeListener { _: NestedScrollView?, _: Int, scrollY: Int, _: Int, _: Int ->
             scrollHandler(scrollY)
         }
         viewModel.weatherLiveData.observe(viewLifecycleOwner, Observer { result ->
-            swipeRefreshLayout.isRefreshing = false
+            //swipeRefreshLayout.isRefreshing = false
+            refreshLayout.finishRefresh(1000)
             val weatherResponse = result.getOrNull()
             if (null != weatherResponse) {
                 //Log.d("weatherResponse", weatherResponse.realtime.toString())
@@ -180,7 +169,13 @@ class WeatherFragment : Fragment() {
             }
             true
         }
-        swipeRefreshLayout.setOnRefreshListener {
+        gotoForecast.setOnClickListener {
+            weatherActivity.startActivity<ForecastActivity>()
+        }
+        /*swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
+        }*/
+        refreshLayout.setOnRefreshListener {
             viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
         }
         viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
@@ -226,15 +221,15 @@ class WeatherFragment : Fragment() {
             viewModel.updateLocation()
             if (weatherActivity.isCurrentFragment(this)) {
                 /**首个fragment需要在这里刷新,其他在viewpager切换时刷新*/
-                titleBarTempText.text = "${it.temperature.toInt()}°"
-                videoView.setVideoURI(
+                weatherActivity.titleBarTempText.text = "${it.temperature.toInt()}°"
+                weatherActivity.videoView.setVideoURI(
                     Uri.parse(
                         "android.resource://${weatherActivity.packageName}/${WeatherUtil.getVideoNameBySkyCon(
                             it.skycon
                         )}"
                     )
                 )
-                videoView.start()
+                weatherActivity.videoView.start()
                 scrollView.viewTreeObserver.addOnGlobalLayoutListener {
                     scrollTo(weatherActivity.viewModel.currentPosition)
                 }
@@ -262,13 +257,6 @@ class WeatherFragment : Fragment() {
         return scrollView?.scrollY ?: 0
     }
 
-    private fun showTitleBar(scrollY: Int) {
-        val isShowTitleBarBg = scrollY.toFloat() / scrollToShowTitleBarDistance >= 1f
-        if (isShowTitleBarBg) titleBar.setBackgroundColor(Color.WHITE)
-        else titleBar.setBackgroundColor(Color.TRANSPARENT)
-        Log.d(TAG, "${viewModel.location.name}isShowTitleBarBg =${isShowTitleBarBg}")
-    }
-
     private fun setSkyConColor(skyCon: String) {
         tempText.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
         skyConText.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
@@ -277,20 +265,7 @@ class WeatherFragment : Fragment() {
         aqiValue.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
         right.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
         yesterdayDiff.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
-    }
-
-    private fun setTextViewSkyConColor(textView: TextView, skyCon: String) {
-        val colors = WeatherUtil.getSkyConColor(skyCon)
-        val linearGradient = LinearGradient(
-            0f,
-            0f,
-            0f,
-            textView.paint.textSize,
-            resources.getColor(colors.first),
-            resources.getColor(colors.second),
-            Shader.TileMode.CLAMP
-        )
-        textView.paint.shader = linearGradient
-        textView.invalidate()
+        forecastText.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
+        forecastRight.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
     }
 }

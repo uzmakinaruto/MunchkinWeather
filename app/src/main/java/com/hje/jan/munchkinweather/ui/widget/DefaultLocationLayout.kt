@@ -9,7 +9,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.hje.jan.munchkinweather.R
-import com.hje.jan.munchkinweather.extension.dp2px
+import com.hje.jan.munchkinweather.extension.dp
 import com.hje.jan.munchkinweather.util.PreferenceUtils
 import kotlinx.android.synthetic.main.default_location.view.*
 
@@ -61,13 +61,13 @@ class DefaultLocationLayout : RelativeLayout {
         lateinit var childLinearLayout: LinearLayout
         val layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT)
         layoutParams.weight = 1f
-        layoutParams.leftMargin = 4.dp2px()
-        layoutParams.rightMargin = 4.dp2px()
+        layoutParams.leftMargin = 4.dp()
+        layoutParams.rightMargin = 4.dp()
         for (i in cityList.indices) {
             if (i % 4 == 0) {
                 childLinearLayout = LinearLayout(context)
                 childLinearLayout.orientation = LinearLayout.HORIZONTAL
-                childLinearLayout.setPadding(16.dp2px(), 4.dp2px(), 16.dp2px(), 4.dp2px())
+                childLinearLayout.setPadding(16.dp(), 4.dp(), 16.dp(), 4.dp())
                 famousCityLayout.addView(childLinearLayout)
             }
             val textView = TextView(context)
@@ -80,7 +80,7 @@ class DefaultLocationLayout : RelativeLayout {
                 textView.setTextColor(Color.BLACK)
                 textView.setBackgroundResource(R.drawable.shape_default_location)
             }
-            textView.setPadding(4.dp2px(), 4.dp2px(), 4.dp2px(), 4.dp2px())
+            textView.setPadding(4.dp(), 4.dp(), 4.dp(), 4.dp())
             textView.layoutParams = layoutParams
             textView.isSingleLine = true
             textView.isClickable = true
@@ -103,13 +103,13 @@ class DefaultLocationLayout : RelativeLayout {
         lateinit var childLinearLayout: LinearLayout
         val layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT)
         layoutParams.weight = 1f
-        layoutParams.leftMargin = 4.dp2px()
-        layoutParams.rightMargin = 4.dp2px()
+        layoutParams.leftMargin = 4.dp()
+        layoutParams.rightMargin = 4.dp()
         for (i in sightsList.indices) {
             if (i % 4 == 0) {
                 childLinearLayout = LinearLayout(context)
                 childLinearLayout.orientation = LinearLayout.HORIZONTAL
-                childLinearLayout.setPadding(16.dp2px(), 4.dp2px(), 16.dp2px(), 4.dp2px())
+                childLinearLayout.setPadding(16.dp(), 4.dp(), 16.dp(), 4.dp())
                 famousSightsLayout.addView(childLinearLayout)
             }
             val textView = TextView(context)
@@ -122,7 +122,7 @@ class DefaultLocationLayout : RelativeLayout {
                 textView.setTextColor(Color.BLACK)
                 textView.setBackgroundResource(R.drawable.shape_default_location)
             }
-            textView.setPadding(4.dp2px(), 4.dp2px(), 4.dp2px(), 4.dp2px())
+            textView.setPadding(4.dp(), 4.dp(), 4.dp(), 4.dp())
             textView.layoutParams = layoutParams
             textView.isSingleLine = true
             textView.setOnClickListener {

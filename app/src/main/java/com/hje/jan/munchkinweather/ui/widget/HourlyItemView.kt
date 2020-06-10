@@ -15,7 +15,7 @@ class HourlyItemView : RelativeLayout {
     fun bindData(hourlyResult: HourlyResponse.Hourly, position: Int) {
         tempText.text = "${hourlyResult.temperature[position].value.toInt()}"
         tempText.textColorResource =
-            WeatherUtil.getSkyConColor(hourlyResult.skyCon[position].value).first
+            WeatherUtil.getSkyConColor(hourlyResult.skyCon[0].value).first
         degree.textColorResource =
             WeatherUtil.getSkyConColor(hourlyResult.skyCon[position].value).first
         skyConText.text = WeatherUtil.getSkyConDescription(hourlyResult.skyCon[position].value)

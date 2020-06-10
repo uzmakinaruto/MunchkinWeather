@@ -119,7 +119,7 @@ object WeatherUtil {
             "CLEAR_NIGHT" -> R.drawable.ic_week_sun_night
             "PARTLY_CLOUDY_DAY" -> R.drawable.ic_week_cloudy
             "PARTLY_CLOUDY_NIGHT" -> R.drawable.ic_week_cloudy_night
-            "CLOUDY" -> R.drawable.ic_week_cloudy
+            "CLOUDY" -> R.drawable.ic_week_overcast
             "LIGHT_HAZE" -> R.drawable.ic_week_haze
             "MODERATE_HAZE" -> R.drawable.ic_week_haze
             "HEAVY_HAZE" -> R.drawable.ic_week_haze
@@ -296,8 +296,8 @@ object WeatherUtil {
                 R.color.color_cloudy_end
             )
             "LIGHT_HAZE", "MODERATE_HAZE", "HEAVY_HAZE" -> Pair(
-                R.color.color_cloudy_start,
-                R.color.color_cloudy_end
+                R.color.color_rain_start,
+                R.color.color_rain_end
             )
             "LIGHT_RAIN", "MODERATE_RAIN", "HEAVY_RAIN", "STORM_RAIN" -> Pair(
                 R.color.color_rain_start,

@@ -41,6 +41,7 @@
         </activity>
         <activity android:name=".ui.activity.ManagerLocationActivity" />
         <activity android:name=".ui.activity.SearchPlaceActivity" />
+        <activity android:name=".ui.activity.ForecastActivity" />
 
         <meta-data
             android:name="com.amap.api.v2.apikey"

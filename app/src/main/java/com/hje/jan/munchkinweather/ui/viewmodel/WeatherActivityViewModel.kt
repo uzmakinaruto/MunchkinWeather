@@ -25,4 +25,5 @@ class WeatherActivityViewModel : ViewModel() {
 
     var currentPosition = 0
     var currentItem = 0
+    var clapBoardAlpha = 0.0f
 }

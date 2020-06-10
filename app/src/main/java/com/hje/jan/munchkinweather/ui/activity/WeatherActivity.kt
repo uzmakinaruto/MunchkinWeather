@@ -24,6 +24,7 @@ import org.jetbrains.anko.startActivity
 class WeatherActivity : AppCompatActivity() {
 
     val viewModel by lazy { ViewModelProvider(this).get(WeatherActivityViewModel::class.java) }
+    val TAG = "WeatherActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
@@ -90,19 +91,23 @@ class WeatherActivity : AppCompatActivity() {
                 positionOffset: Float,
                 positionOffsetPixels: Int
             ) {
-                if (position == viewPager.currentItem) {
-                    clapBoard.alpha = positionOffset
+                var alpha: Float
+                alpha = if (position == viewPager.currentItem) {
+                    viewModel.clapBoardAlpha + positionOffset
                     /**划向下一页*/
                 } else {
                     /**划向上一页*/
-                    clapBoard.alpha = 1 - positionOffset
+                    viewModel.clapBoardAlpha + 1 - positionOffset
                 }
+                if (alpha > 1) alpha = 1f
+                Log.d(TAG, "alpha${alpha}  viewModel.clapBoardAlpha${viewModel.clapBoardAlpha}")
+                clapBoard.alpha = alpha
             }
 
             override fun onPageSelected(position: Int) {
                 viewModel.currentItem = position
                 val fragment = viewModel.fragments[position]
-                clapBoard.alpha = 0f
+                //clapBoard.alpha = 0f
                 locationText.text = viewModel.locations[position].name
                 titleBarTempText.text = fragment.getCurrentTemp()
                 videoView.pause()
