@@ -1,15 +1,20 @@
 package com.hje.jan.munchkinweather.logic.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class DailyResponse(
     val result: Result,
     val status: String
-) {
+) : Parcelable {
+    @Parcelize
     data class Result(
         val daily: Daily
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Daily(
         /**空气质量*/
         @SerializedName("air_quality") val airQuality: AirQuality,
@@ -41,46 +46,52 @@ data class DailyResponse(
         val visibility: List<Visibility>,
         /**#风力与风向，最大值，平均值，最小值*/
         val wind: List<Wind>
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class AirQuality(
         /**空气质量指数最大值，平均值，最小值*/
         val aqi: List<Aqi>,
         /**PM25，最大值，平均值，最小值*/
         val pm25: List<Pm25>
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Astro(
         /**日出与日落时刻*/
         val date: String,
         val sunrise: Sunrise,
         val sunset: Sunset
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Cloudrate(
         /**云量，最大值，平均值，最小值*/
         val avg: Double,
         val date: String,
         val max: Double,
         val min: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Dswrf(
         /**短波辐射下向通量，最大值，平均值，最小值*/
         val avg: Double,
         val date: String,
         val max: Double,
         val min: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Humidity(
         /**相对湿度，最大值，平均值，最小值*/
         val avg: Double,
         val date: String,
         val max: Double,
         val min: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class LifeIndex(
         /**洗车指数*/
         val carWashing: List<CarWashing>,
@@ -92,154 +103,178 @@ data class DailyResponse(
         val dressing: List<Dressing>,
         /**紫外线指数*/
         val ultraviolet: List<Ultraviolet>
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Precipitation(
         val avg: Double,
         val date: String,
         val max: Double,
         val min: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Pressure(
         /**降水*/
         val avg: Double,
         val date: String,
         val max: Double,
         val min: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Skycon(
         /**天气状态*/
         val date: String,
         val value: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Skycon08h20h(
         /**白天主要天气现象*/
         val date: String,
         val value: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Skycon20h32h(
         /**夜晚主要天气现象*/
         val date: String,
         val value: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Temperature(
         /**温度，最大值，平均值，最小值*/
         val avg: Double,
         val date: String,
         val max: Double,
         val min: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Visibility(
         /**能见度，最大值，平均值，最小值*/
         val avg: Double,
         val date: String,
         val max: Double,
         val min: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Wind(
         /**风力与风向，最大值，平均值，最小值*/
         val avg: AvgX,
         val date: String,
         val max: MaxX,
         val min: MinX
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Aqi(
         /**空气质量*/
         val avg: Avg,
         val date: String,
         val max: Max,
         val min: Min
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Pm25(
         /**PM25，最大值，平均值，最小值*/
         val avg: Float,
         val date: String,
         val max: Float,
         val min: Float
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Avg(
         val chn: Double,
         val usa: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Max(
         val chn: Double,
         val usa: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Min(
         val chn: Double,
         val usa: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Sunrise(
         /**日出时间*/
         val time: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Sunset(
         /**日落时间*/
         val time: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class CarWashing(
         /**洗车指数*/
         val date: String,
         val desc: String,
         val index: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class ColdRisk(
         /**感冒指数*/
         val date: String,
         val desc: String,
         val index: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Comfort(
         /**舒适度指数*/
         val date: String,
         val desc: String,
         val index: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Dressing(
         /**穿衣指数*/
         val date: String,
         val desc: String,
         val index: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Ultraviolet(
         /**紫外线指数*/
         val date: String,
         val desc: String,
         val index: String
-    )
+    ) : Parcelable
+
+    @Parcelize
     /**风力与风向平均值 最大值 最小值*/
     data class AvgX(
         val direction: Double,
         val speed: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class MaxX(
         val direction: Double,
         val speed: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class MinX(
         val direction: Double,
         val speed: Double
-    )
+    ) : Parcelable
 }
 

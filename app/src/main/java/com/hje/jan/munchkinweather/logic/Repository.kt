@@ -31,7 +31,7 @@ object Repository {
             coroutineScope {
                 /**这里会并发执行*/
                 val realtime = async { MunchkinWeatherNetwork.getRealtimeResponse(lng, lat) }
-                val daily = async { MunchkinWeatherNetwork.getDailyResponse(lng, lat, 5) }
+                val daily = async { MunchkinWeatherNetwork.getDailyResponse(lng, lat, 15) }
                 val hourly = async { MunchkinWeatherNetwork.getHourlyResponse(lng, lat) }
                 /**这里会等待请求结果*/
                 val realtimeResponse = realtime.await()

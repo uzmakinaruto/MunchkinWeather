@@ -170,7 +170,7 @@ class WeatherFragment : Fragment() {
             true
         }
         gotoForecast.setOnClickListener {
-            weatherActivity.startActivity<ForecastActivity>()
+            weatherActivity.startActivity<ForecastActivity>("forecast" to viewModel.dailyResult)
         }
         /*swipeRefreshLayout.setOnRefreshListener {
             viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)

@@ -11,4 +11,9 @@
     <color name="color_sunny_end">#92C4EB</color>
     <color name="color_cloudy_start">#7796C3</color>
     <color name="color_cloudy_end">#97B2DA</color>
+
+    <color name="color_chart_odd_start">#E8F5FF</color>
+    <color name="color_chart_odd_end">#FDFEFF</color>
+    <color name="color_chart_even_start">#F0F9FF</color>
+    <color name="color_chart_even_end">#FFFFFF</color>
 </resources>
