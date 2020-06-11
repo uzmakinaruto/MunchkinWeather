@@ -6,7 +6,10 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -27,7 +30,6 @@ import kotlinx.android.synthetic.main.alert_dialog_add_location.view.*
 import kotlinx.android.synthetic.main.fragment_manager_location.*
 import kotlinx.android.synthetic.main.item_location_footer.*
 import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.support.v4.toast
 
 class ManagerLocationFragment : Fragment(), AMapLocationListener {
@@ -183,14 +185,11 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
     }
 
     override fun onLocationChanged(aMapLocation: AMapLocation?) {
-        locatingDialog?.dismiss()
         if (aMapLocation != null && aMapLocation.errorCode == 0) {
             managerLocationActivity.viewModel.setLocateLocation(aMapLocation)
         } else {
+            locatingDialog?.dismiss()
             toast("定位失败,请检查网络与定位开关")
-            alert {
-                message = "${aMapLocation?.errorInfo}  errCode = ${aMapLocation?.errorCode}"
-            }.show()
         }
         locationClient?.stopLocation()
     }

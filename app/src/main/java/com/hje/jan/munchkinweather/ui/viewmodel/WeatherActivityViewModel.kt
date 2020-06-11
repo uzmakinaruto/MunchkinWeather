@@ -18,7 +18,7 @@ class WeatherActivityViewModel : ViewModel() {
     }
 
     fun refreshLocations() {
-        _selectedLocations.postValue(null)
+        _selectedLocations.value = _selectedLocations.value
     }
 
     val locations: MutableList<LocationItemBean> = mutableListOf()

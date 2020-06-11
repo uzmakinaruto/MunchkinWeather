@@ -143,24 +143,27 @@ class WeatherFragment : Fragment() {
             refreshLayout.finishRefresh(1000)
             val weatherResponse = result.getOrNull()
             if (null != weatherResponse) {
-                //Log.d("weatherResponse", weatherResponse.realtime.toString())
-                //Log.d("weatherResponse", weatherResponse.daily.toString())
                 Log.d(TAG, weatherResponse.hourly.toString())
-                viewModel.dailyResult = weatherResponse.daily
+                /*viewModel.dailyResult = weatherResponse.daily
                 viewModel.hourResult = weatherResponse.hourly
-                viewModel.realtimeResult = weatherResponse.realtime
+                viewModel.realtimeResult = weatherResponse.realtime*/
+                viewModel.location.daily = weatherResponse.daily
+                viewModel.location.hourly = weatherResponse.hourly
+                viewModel.location.realTime = weatherResponse.realtime
+                viewModel.updateLocation()
                 refreshWeatherUI()
             } else {
                 toast(result.exceptionOrNull()?.localizedMessage ?: "Unknown Exception")
             }
         })
-        hourlyAdapter = HourlyAdapter(viewModel.hourResult)
+        hourlyAdapter = HourlyAdapter(viewModel.location.hourly)
         hourlyRV.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
         hourlyRV.adapter = hourlyAdapter
 
-        dailyAdapter = DailyAdapter(viewModel.dailyResult)
+        dailyAdapter = DailyAdapter(viewModel.location.daily)
         dailyRV.layoutManager = LinearLayoutManager(context)
         dailyRV.adapter = dailyAdapter
+
         aqiLayout.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 aqiLayout.alpha = 0.5f
@@ -170,30 +173,32 @@ class WeatherFragment : Fragment() {
             true
         }
         gotoForecast.setOnClickListener {
-            weatherActivity.startActivity<ForecastActivity>("forecast" to viewModel.dailyResult)
+            weatherActivity.startActivity<ForecastActivity>("forecast" to viewModel.location.daily)
         }
-        /*swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
-        }*/
+
         refreshLayout.setOnRefreshListener {
             viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
         }
-        viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
+        if (viewModel.location.realTime == null) {
+            viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
+        } else {
+            refreshWeatherUI()
+        }
+
     }
 
-
     private fun refreshWeatherUI() {
-        viewModel.hourResult?.let {
+        viewModel.location.hourly?.let {
             hourlyAdapter.refresh(it)
             weatherDesc.text = it.description
         }
-        viewModel.dailyResult?.let {
+        viewModel.location.daily?.let {
             dailyAdapter.refresh(it)
             clothesIndex.text = it.life_index.dressing[0].desc
             getColdIndex.text = it.life_index.coldRisk[0].desc
             washCarIndex.text = it.life_index.carWashing[0].desc
         }
-        viewModel.realtimeResult?.let {
+        viewModel.location.realTime?.let {
             weatherInfo.visibility = View.VISIBLE
             setSkyConColor(it.skycon)
             degree.imageResource = WeatherUtil.getDegreeColor(it.skycon)
@@ -216,8 +221,6 @@ class WeatherFragment : Fragment() {
             ultravioletIndex.text = it.lifeIndex.ultraviolet.desc
             comfortIndex.text = it.lifeIndex.comfort.desc
             visibilityIndex.text = "${it.visibility.toInt()}公里"
-            viewModel.location.skyCon = it.skycon
-            viewModel.location.temp = it.temperature.toInt()
             viewModel.updateLocation()
             if (weatherActivity.isCurrentFragment(this)) {
                 /**首个fragment需要在这里刷新,其他在viewpager切换时刷新*/
@@ -238,14 +241,14 @@ class WeatherFragment : Fragment() {
     }
 
     fun getCurrentTemp(): String {
-        viewModel.realtimeResult?.let {
+        viewModel.location.realTime?.let {
             return "${it.temperature.toInt()}°"
         }
         return ""
     }
 
     fun getSkyCon(): String? {
-        return viewModel.realtimeResult?.skycon
+        return viewModel.location.realTime?.skycon
     }
 
     fun scrollTo(scrollY: Int) {

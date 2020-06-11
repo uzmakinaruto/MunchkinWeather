@@ -13,10 +13,18 @@ import org.jetbrains.anko.imageResource
 class LocationItemView : RelativeLayout {
     fun bindData(location: LocationItemBean) {
         locationText.text = location.name
-        skyConImage.imageResource = WeatherUtil.getSkyConImage(location.skyCon)
-        if (null == location.temp) tempText.text = "N/A"
-        else tempText.text = "${location.temp}℃"
-        skyConText.text = WeatherUtil.getSkyConDescription(location.skyCon)
+        //skyConImage.imageResource = WeatherUtil.getSkyConImage(location.skyCon)
+        skyConImage.imageResource = WeatherUtil.getSkyConImage(location.realTime?.skycon)
+        /*if (null == location.temp) tempText.text = "N/A"
+        else tempText.text = "${location.temp}℃"*/
+        //skyConText.text = WeatherUtil.getSkyConDescription(location.skyCon)
+        if (null == location.realTime) {
+            tempText.text = "N/A"
+            skyConText.text = "N/A"
+        } else {
+            tempText.text = "${location.realTime!!.temperature.toInt()}℃"
+            skyConText.text = WeatherUtil.getSkyConDescription(location.realTime?.skycon)
+        }
     }
 
     constructor(context: Context?) : super(context)

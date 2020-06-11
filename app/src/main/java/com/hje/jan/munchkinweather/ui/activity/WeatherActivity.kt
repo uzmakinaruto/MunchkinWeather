@@ -23,8 +23,10 @@ import org.jetbrains.anko.startActivity
 
 class WeatherActivity : AppCompatActivity() {
 
+    companion object {
+        const val TAG = "WeatherActivity"
+    }
     val viewModel by lazy { ViewModelProvider(this).get(WeatherActivityViewModel::class.java) }
-    val TAG = "WeatherActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
@@ -64,7 +66,6 @@ class WeatherActivity : AppCompatActivity() {
                     pageIndicatorView.setIsLocateEnable(false)
                 }
                 pageIndicatorView.selection = viewModel.currentItem
-
             }
         })
         viewPager.offscreenPageLimit = 2

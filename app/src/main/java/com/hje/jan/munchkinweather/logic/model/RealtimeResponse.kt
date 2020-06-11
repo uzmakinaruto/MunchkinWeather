@@ -1,6 +1,10 @@
 package com.hje.jan.munchkinweather.logic.model
 
+import android.os.Parcelable
+import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
+import com.hje.jan.munchkinweather.logic.database.converter.*
+import kotlinx.android.parcel.Parcelize
 
 data class RealtimeResponse(
     val result: Result,
@@ -11,9 +15,11 @@ data class RealtimeResponse(
         val realtime: Realtime
     )
 
+    @Parcelize
     data class Realtime(
         /**空气质量*/
-        @SerializedName("air_quality") val airQuality: AirQuality,
+        @SerializedName("air_quality")
+        val airQuality: AirQuality,
         /**体感温度*/
         @SerializedName("apparent_temperature") val apparentTemperature: Double,
         /**云量*/
@@ -23,7 +29,8 @@ data class RealtimeResponse(
         /**相对湿度*/
         val humidity: Double,
         /**生活指数*/
-        @SerializedName("life_index") val lifeIndex: LifeIndex,
+        @SerializedName("life_index")
+        val lifeIndex: LifeIndex,
         /**降水*/
         val precipitation: Precipitation,
         /**气压*/
@@ -38,8 +45,9 @@ data class RealtimeResponse(
         val visibility: Double,
         /**风*/
         val wind: Wind
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class AirQuality(
         /**空气质量指数*/
         val aqi: Aqi,
@@ -57,65 +65,74 @@ data class RealtimeResponse(
         val pm25: Float,
         /**二氧化硫，质量浓度值*/
         val so2: Float
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class LifeIndex(
         /**舒适度指数及其自然语言描述*/
         val comfort: Comfort,
         /**紫外线指数及其自然语言描述*/
         val ultraviolet: Ultraviolet
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Precipitation(
         /**降水*/
         val local: Local,
         val nearest: Nearest
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Wind(
         /**风向，单位是度。正北方向为0度，顺时针增加到360度*/
         val direction: Double,
         /**风速，米制下是公里每小时*/
         val speed: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Aqi(
         /**中国标准*/
         val chn: Int,
         /**美国标准*/
         val usa: Int
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Description(
         val chn: String,
         val usa: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Comfort(
         /**舒适度指数及其自然语言描述*/
         val desc: String,
         val index: Int
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Ultraviolet(
         /**紫外线指数及其自然语言描述*/
         val desc: String,
         val index: Double
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Local(
         /**本地降水观测的数据源*/
         @SerializedName("datasource") val dataSource: String,
         /**本地降水强度（单位为雷达降水强度）*/
         val intensity: Double,
         val status: String
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class Nearest(
         /**最近的降水带距离*/
         val distance: Double,
         /**最近的降水带降水强度（单位为雷达降水强度）*/
         val intensity: Double,
         val status: String
-    )
+    ) : Parcelable
 }

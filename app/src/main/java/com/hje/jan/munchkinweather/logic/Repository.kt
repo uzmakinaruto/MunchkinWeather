@@ -6,7 +6,10 @@ import com.hje.jan.munchkinweather.logic.database.MunchkinWeatherDataBase
 import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 import com.hje.jan.munchkinweather.logic.model.WeatherResponse
 import com.hje.jan.munchkinweather.logic.network.MunchkinWeatherNetwork
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 
 object Repository {
 
@@ -55,7 +58,7 @@ object Repository {
         emit(result)
     }
 
-    suspend fun getLocationWeatherInfo(location: LocationItemBean) {
+    /*suspend fun getLocationWeatherInfo(location: LocationItemBean) {
         withContext(Dispatchers.IO) {
             val response = MunchkinWeatherNetwork.getRealtimeResponse(location.lng, location.lat)
             if (response.status == "ok") {
@@ -69,16 +72,43 @@ object Repository {
                 }
             }
         }
+    }*/
+
+    suspend fun getLocationWeatherInfo(location: LocationItemBean): Boolean {
+        return withContext(Dispatchers.IO) {
+            var result = false
+            val realtime =
+                async { MunchkinWeatherNetwork.getRealtimeResponse(location.lng, location.lat) }
+            val daily =
+                async { MunchkinWeatherNetwork.getDailyResponse(location.lng, location.lat, 15) }
+            val hourly =
+                async { MunchkinWeatherNetwork.getHourlyResponse(location.lng, location.lat) }
+            /**这里会等待请求结果*/
+            val realtimeResponse = realtime.await()
+            val dailyResponse = daily.await()
+            val hourlyResponse = hourly.await()
+            if (realtimeResponse.status == "ok" && dailyResponse.status == "ok" && hourlyResponse.status == "ok") {
+                /**传入的location不一定从database找出来的 需要从数据库找到对应location,再进行更新*/
+                val sqlLocation = getLocationByName(location.name)
+                if (sqlLocation != null) {
+                    sqlLocation.realTime = realtimeResponse.result.realtime
+                    sqlLocation.hourly = hourlyResponse.result.hourly
+                    sqlLocation.daily = dailyResponse.result.daily
+                    updateLocation(sqlLocation)
+                    result = true
+                }
+            }
+            result
+        }
     }
 
+    fun getWeatherInfo() {
+
+    }
     suspend fun addLocation(location: LocationItemBean) {
         withContext(Dispatchers.IO) {
             locationDao.addLocation(location)
         }
-    }
-
-    fun addDefaultLocateLocation() {
-
     }
 
     fun getLocations() = liveData(Dispatchers.IO) {
@@ -101,18 +131,6 @@ object Repository {
         return locationDao.getLocationByName(name)
     }
 
-    /*fun setDefaultLocateLocation() {
-        CoroutineScope(Job()).launch {
-            withContext(Dispatchers.IO) {
-                var location = locationDao.getLocateLocation()
-                if (null == location) {
-                    location = LocationItemBean("", "", "", isLocate = true)
-                    locationDao.addLocation(location)
-                }
-            }
-        }
-    }*/
-
     fun setLocateLocation(name: String, lng: String, lat: String) =
         liveData(Dispatchers.IO) {
             var result = false
@@ -121,7 +139,9 @@ object Repository {
             locateLocation.lng = lng
             locateLocation.lat = lat
             locateLocation.isLocateEnable = true
-            val response =
+            updateLocation(locateLocation)
+            result = getLocationWeatherInfo(locateLocation)
+            /*val response =
                 MunchkinWeatherNetwork.getRealtimeResponse(
                     locateLocation.lng,
                     locateLocation.lat
@@ -131,7 +151,7 @@ object Repository {
                 locateLocation.skyCon = response.result.realtime.skycon
                 updateLocation(locateLocation)
                 result = true
-            }
+            }*/
             emit(result)
         }
 }

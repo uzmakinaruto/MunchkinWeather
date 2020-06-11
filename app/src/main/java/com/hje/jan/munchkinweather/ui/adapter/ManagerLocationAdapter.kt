@@ -115,9 +115,13 @@ class ManagerLocationAdapter(
                 if (location.isLocateEnable) {
                     header.weatherLayout.visibility = View.VISIBLE
                     header.location.text = location.name
-                    header.temp.text = "${location.temp}℃"
-                    header.scText.text = WeatherUtil.getSkyConDescription(location.skyCon)
-                    header.scImage.imageResource = WeatherUtil.getSkyConImage(location.skyCon)
+                    //header.temp.text = "${location.temp}℃"
+                    header.temp.text = "${location.realTime?.temperature?.toInt()}℃"
+                    //header.scText.text = WeatherUtil.getSkyConDescription(location.skyCon)
+                    header.scText.text = WeatherUtil.getSkyConDescription(location.realTime?.skycon)
+                    //header.scImage.imageResource = WeatherUtil.getSkyConImage(location.skyCon)
+                    header.scImage.imageResource =
+                        WeatherUtil.getSkyConImage(location.realTime?.skycon)
                     header.locateSwitch.isChecked = true
                 } else {
                     header.weatherLayout.visibility = View.GONE
