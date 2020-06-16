@@ -36,6 +36,10 @@ class ManagerLocationActivity : AppCompatActivity() {
         }
         viewModel.weatherUpdate.observe(this, Observer {
         })
+
+       /* viewModel.locationsLiveData.observe(this, Observer {
+            toast("change")
+        })*/
     }
 
     fun startAddLocation() {

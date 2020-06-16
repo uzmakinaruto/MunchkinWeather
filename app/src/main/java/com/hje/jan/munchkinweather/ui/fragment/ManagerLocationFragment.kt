@@ -92,9 +92,12 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         recyclerview.adapter = adapter
         dragHelper.attachToRecyclerView(recyclerview)
         adapter.onSelectListener = { position ->
+            var currentItem = position
+            if (!managerLocationActivity.viewModel.locations[0].isLocateEnable)
+                currentItem = position - 1
             activity?.setResult(
                 Activity.RESULT_OK,
-                Intent().apply { putExtra("currentItem", position) })
+                Intent().apply { putExtra("currentItem", currentItem) })
             activity?.finish()
         }
         adapter.addLocationListener = {

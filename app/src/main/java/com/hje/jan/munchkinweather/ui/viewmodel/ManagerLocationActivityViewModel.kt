@@ -76,5 +76,6 @@ class ManagerLocationActivityViewModel : ViewModel() {
         }
     }
 
+    val locationsLiveData = Repository.locations
     val locations = Repository.locations.value!!
 }

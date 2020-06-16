@@ -143,8 +143,8 @@ class ManagerLocationAdapter(
 
     fun onMove(fromPosition: Int, toPosition: Int) {
         Collections.swap(locations, fromPosition, toPosition)
-        locations[fromPosition].position = toPosition
-        locations[toPosition].position = fromPosition
+        locations[fromPosition].position = fromPosition
+        locations[toPosition].position = toPosition
         activity.viewModel.updateLocation(locations[fromPosition])
         activity.viewModel.updateLocation(locations[toPosition])
         notifyItemMoved(fromPosition, toPosition)

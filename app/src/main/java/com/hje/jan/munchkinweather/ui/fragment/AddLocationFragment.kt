@@ -144,6 +144,7 @@ class AddLocationFragment : Fragment() {
                     }
                 }
             }
+            if (!locations[0].isLocateEnable) position -= 1
             activity?.setResult(RESULT_OK, Intent().apply { putExtra("currentItem", position) })
             activity?.finish()
         }

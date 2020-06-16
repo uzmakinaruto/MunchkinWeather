@@ -40,6 +40,7 @@ class DefaultLocationAdapter(
                 holder.name.textColor = Color.WHITE
                 holder.name.setBackgroundResource(R.drawable.shape_default_location_selected)
                 //添加地址
+                location.position = activity.viewModel.locations.size
                 activity.viewModel.addLocation(location)
                 activity.viewModel.getLocationWeatherInfo(location)
             }

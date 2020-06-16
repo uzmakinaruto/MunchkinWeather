@@ -81,7 +81,6 @@ class WeatherActivity : AppCompatActivity() {
             }
 
             override fun onPageSelected(position: Int) {
-                //viewModel.currentItem = position
                 val fragment = viewModel.fragments[position]
                 val locations = viewModel.locations.value!!
                 viewModel.currentItem = position
@@ -120,14 +119,14 @@ class WeatherActivity : AppCompatActivity() {
             MunchkinWeatherApplication.isFirstEnter = false
             startActivityForResult<ManagerLocationActivity>(0)
         } else {
-            viewModel.fragments.clear()
-            for (location in locations) {
-                if (!location.isLocate || (location.isLocate && location.isLocateEnable)) {
-                    val fragment = WeatherFragment.newInstance(location)
-                    viewModel.fragments.add(fragment)
-                }
-            }
             viewPager.postDelayed({
+                viewModel.fragments.clear()
+                for (location in locations) {
+                    if (!location.isLocate || (location.isLocate && location.isLocateEnable)) {
+                        val fragment = WeatherFragment.newInstance(location)
+                        viewModel.fragments.add(fragment)
+                    }
+                }
                 viewPager.adapter?.notifyDataSetChanged()
                 if (locations[0].isLocateEnable) {
                     pageIndicatorView.setIsLocateEnable(true)
@@ -147,7 +146,7 @@ class WeatherActivity : AppCompatActivity() {
                 } else {
                     locationText.text = locations[viewPager.currentItem + 1].name
                 }
-            },50)
+            },100)
 
         }
     }
