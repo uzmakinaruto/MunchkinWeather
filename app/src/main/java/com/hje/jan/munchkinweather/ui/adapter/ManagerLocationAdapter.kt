@@ -30,6 +30,7 @@ class ManagerLocationAdapter(
     var addLocationListener: (() -> Unit)? = null
     var startLocationListener: (() -> Unit)? = null
     var deleteLocationListener:(()->Unit)? = null
+    var onSelectListener: ((position: Int) -> Unit)? = null
     companion object {
         private const val TYPE_HEADER = 0
         private const val TYPE_ITEMS = 1
@@ -44,6 +45,10 @@ class ManagerLocationAdapter(
             TYPE_HEADER -> {
                 val header = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_location_header, parent, false)
+                header.setOnClickListener {
+                    if (locations[0].isLocateEnable)
+                        onSelectListener?.invoke(0)
+                }
                 holder = ViewHolder(header)
                 header.locateSwitch.setOnClickListener {
                     if (header.locateSwitch.isChecked) {
@@ -76,6 +81,9 @@ class ManagerLocationAdapter(
             else -> {
                 val itemView = LocationItemView(parent.context)
                 holder = ViewHolder(itemView)
+                itemView.setOnClickListener {
+                    onSelectListener?.invoke(holder.adapterPosition)
+                }
                 itemView.removeLocation.setOnClickListener {
                     if (isAvoidedDoubleClick()) {
                         activity.viewModel.deleteLocation(locations[holder.adapterPosition])

@@ -13,9 +13,14 @@ class ManagerLocationActivityViewModel : ViewModel() {
     //private val _locations = MutableLiveData<Any?>()
 
     val isLocate = Transformations.switchMap(_isLocate) { locateLoaction ->
-        Repository.getLocateWeatherInfo(locateLoaction)
+        Repository.getLocationWeatherInfo(locateLoaction)
     }
 
+    private val _weatherUpdate = MutableLiveData<LocationItemBean>()
+
+    val weatherUpdate = Transformations.switchMap(_weatherUpdate) {
+        Repository.getLocationWeatherInfo(it)
+    }
 
     //val locations = Repository.locations.value!!
     /**添加地址*/
@@ -38,7 +43,7 @@ class ManagerLocationActivityViewModel : ViewModel() {
     }
 
     fun getLocationWeatherInfo(location: LocationItemBean) {
-        Repository.getLocationWeatherInfo(location)
+        _weatherUpdate.value = location
     }
 
     /**删除地址*/
@@ -71,6 +76,5 @@ class ManagerLocationActivityViewModel : ViewModel() {
         }
     }
 
-    fun getLocations() = Repository.locations.value!!
-    fun refreshLocations() = Repository.refreshLocations()
+    val locations = Repository.locations.value!!
 }

@@ -4,9 +4,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.logic.database.MunchkinWeatherDataBase
-import com.hje.jan.munchkinweather.logic.model.*
+import com.hje.jan.munchkinweather.logic.model.DailyResponse
+import com.hje.jan.munchkinweather.logic.model.HourlyResponse
+import com.hje.jan.munchkinweather.logic.model.RealtimeResponse
 import com.hje.jan.munchkinweather.logic.network.MunchkinWeatherNetwork
 import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Repository 负责viewModel和model层间沟通桥梁
@@ -35,18 +38,13 @@ object Repository {
     /**
      * 搜索地址返回liveData对象以供观察
      * */
-    fun searchPlace(query: String) = liveData(Dispatchers.IO) {
-        val result = try {
-            val response = MunchkinWeatherNetwork.searchPlace(query)
-            if (response.status == "ok") {
+    fun searchPlace(query: String) = fire(Dispatchers.IO) {
+        val response = MunchkinWeatherNetwork.searchPlace(query)
+        if (response.status == "ok") {
                 Result.success(response.places)
             } else {
                 Result.failure(RuntimeException("response status is ${response.status}"))
             }
-        } catch (e: Exception) {
-            Result.failure<List<PlaceResponse.Place>>(e)
-        }
-        emit(result)
     }
 
     /**
@@ -55,113 +53,6 @@ object Repository {
     fun getDatabaseLocations() {
         CoroutineScope(job).launch(Dispatchers.IO) {
             locations.postValue(locationDao.getLocations())
-        }
-    }
-
-    /**
-     * 刷新天气信息
-     * */
-    fun refreshWeather(lng: String, lat: String) = liveData(Dispatchers.IO) {
-        val result = try {
-            coroutineScope {
-                /**这里会并发执行*/
-                val realtime = async { MunchkinWeatherNetwork.getRealtimeResponse(lng, lat) }
-                val daily = async { MunchkinWeatherNetwork.getDailyResponse(lng, lat) }
-                val hourly = async { MunchkinWeatherNetwork.getHourlyResponse(lng, lat) }
-                /**这里会等待请求结果*/
-                val realtimeResponse = realtime.await()
-                val dailyResponse = daily.await()
-                val hourlyResponse = hourly.await()
-                if (realtimeResponse.status == "ok" && dailyResponse.status == "ok" && hourlyResponse.status == "ok") {
-                    Result.success(
-                        WeatherResponse(
-                            realtimeResponse.result.realtime,
-                            dailyResponse.result.daily,
-                            hourlyResponse.result.hourly
-                        )
-                    )
-                } else {
-                    Result.failure(RuntimeException("status is not ok"))
-                }
-            }
-        } catch (e: Exception) {
-            Result.failure<WeatherResponse>(e)
-        }
-        emit(result)
-    }
-
-    /**
-     *获取指定location的天气信息,返回result
-     * */
-    suspend fun getLocationWeatherInfoWithResult(location: LocationItemBean): Boolean {
-        return withContext(Dispatchers.IO) {
-            var result = false
-            val realtime =
-                async { MunchkinWeatherNetwork.getRealtimeResponse(location.lng, location.lat) }
-            val daily =
-                async {
-                    MunchkinWeatherNetwork.getDailyResponse(
-                        location.lng,
-                        location.lat
-                    )
-                }
-            val hourly =
-                async { MunchkinWeatherNetwork.getHourlyResponse(location.lng, location.lat) }
-            /**这里会等待请求结果*/
-            val realtimeResponse = realtime.await()
-            val dailyResponse = daily.await()
-            val hourlyResponse = hourly.await()
-            if (realtimeResponse.status == "ok" && dailyResponse.status == "ok" && hourlyResponse.status == "ok") {
-                //更新内存里的location天气信息
-                location.isLocateEnable = true
-                location.realTime = realtimeResponse.result.realtime
-                location.hourly = hourlyResponse.result.hourly
-                location.daily = dailyResponse.result.daily
-                //保存到数据库
-                updateLocation(location)
-                result = true
-            }
-            result
-        }
-    }
-
-    /**
-     * 获取指定location的天气信息,成功则保存天气信息,不关心返回状态
-     * */
-    fun getLocationWeatherInfo(location: LocationItemBean) {
-        CoroutineScope(job).launch {
-            withContext(Dispatchers.IO) {
-                val realtime =
-                    async { MunchkinWeatherNetwork.getRealtimeResponse(location.lng, location.lat) }
-                val daily =
-                    async {
-                        MunchkinWeatherNetwork.getDailyResponse(
-                            location.lng,
-                            location.lat
-                        )
-                    }
-                val hourly =
-                    async { MunchkinWeatherNetwork.getHourlyResponse(location.lng, location.lat) }
-                /**这里会等待请求结果*/
-                val realtimeResponse = realtime.await()
-                val dailyResponse = daily.await()
-                val hourlyResponse = hourly.await()
-                if (realtimeResponse.status == "ok" && dailyResponse.status == "ok" && hourlyResponse.status == "ok") {
-                    //更新liveData里的location天气信息
-                    location.realTime = realtimeResponse.result.realtime
-                    location.hourly = hourlyResponse.result.hourly
-                    location.daily = dailyResponse.result.daily
-                    //刷新liveData
-                    refreshLocations()
-                    val sqlLocation = getLocationByName(location.name)
-                    if (sqlLocation != null) {
-                        sqlLocation.realTime = realtimeResponse.result.realtime
-                        sqlLocation.hourly = hourlyResponse.result.hourly
-                        sqlLocation.daily = dailyResponse.result.daily
-                        updateLocation(sqlLocation)
-                    }
-                }
-            }
         }
     }
 
@@ -207,41 +98,91 @@ object Repository {
 
 
     /**
-     * 获取本地定位的天气信息,返回liveData
+     * 获取天气信息,返回liveData
      * */
-    fun getLocateWeatherInfo(locateLocation: LocationItemBean) =
-        liveData(Dispatchers.IO) {
-            var result = getLocationWeatherInfoWithResult(locateLocation)
-            emit(result)
+    fun getLocationWeatherInfo(location: LocationItemBean) =
+        fire(Dispatchers.IO) {
+            coroutineScope {
+                val realtime =
+                    async {
+                        MunchkinWeatherNetwork.getRealtimeResponse(
+                            location.lng,
+                            location.lat
+                        )
+                    }
+                val daily =
+                    async {
+                        MunchkinWeatherNetwork.getDailyResponse(
+                            location.lng,
+                            location.lat
+                        )
+                    }
+                val hourly =
+                    async {
+                        MunchkinWeatherNetwork.getHourlyResponse(
+                            location.lng,
+                            location.lat
+                        )
+                    }
+                /**这里会等待请求结果*/
+                val realtimeResponse = realtime.await()
+                val dailyResponse = daily.await()
+                val hourlyResponse = hourly.await()
+                if (realtimeResponse.status == "ok" && dailyResponse.status == "ok" && hourlyResponse.status == "ok") {
+                    //更新内存里的location天气信息
+                    location.realTime = realtimeResponse.result.realtime
+                    location.hourly = hourlyResponse.result.hourly
+                    location.daily = dailyResponse.result.daily
+                    if (location.isLocate) {
+                        location.isLocateEnable = true
+                        updateLocation(location)
+                    } else {
+                        getLocationByName(location.name)?.let {
+                            it.realTime = realtimeResponse.result.realtime
+                            it.hourly = hourlyResponse.result.hourly
+                            it.daily = dailyResponse.result.daily
+                            updateLocation(it)
+                        }
+                    }
+                    refreshLocations()
+                    Result.success(
+                        true
+                    )
+                } else {
+                    Result.failure(RuntimeException("status is not ok"))
+                }
+            }
         }
 
-    fun refreshWeathers() = liveData(Dispatchers.IO) {
-        val results = withContext(Dispatchers.IO) {
+    fun refreshWeathers() = fire(Dispatchers.IO) {
+        coroutineScope {
+            val startIndex = if (locations.value!![0].isLocateEnable) 0
+            else 1
             val realtimeDeferreds = mutableListOf<Deferred<RealtimeResponse>>()
             val dailyDeferreds = mutableListOf<Deferred<DailyResponse>>()
             val hourlyDeferreds = mutableListOf<Deferred<HourlyResponse>>()
             val results = mutableListOf<Boolean>()
-            for (location in locations.value!!) {
+            for (index in startIndex until locations.value!!.size) {
                 realtimeDeferreds.add(async {
                     MunchkinWeatherNetwork.getRealtimeResponse(
-                        location.lng,
-                        location.lat
+                        locations.value!![index].lng,
+                        locations.value!![index].lat
                     )
                 })
                 dailyDeferreds.add(async {
                     MunchkinWeatherNetwork.getDailyResponse(
-                        location.lng,
-                        location.lat
+                        locations.value!![index].lng,
+                        locations.value!![index].lat
                     )
                 })
                 hourlyDeferreds.add(async {
                     MunchkinWeatherNetwork.getHourlyResponse(
-                        location.lng,
-                        location.lat
+                        locations.value!![index].lng,
+                        locations.value!![index].lat
                     )
                 })
             }
-            for (index in 0 until locations.value!!.size) {
+            for (index in 0 until realtimeDeferreds.size) {
                 val realtime = realtimeDeferreds[index].await()
                 val daily = dailyDeferreds[index].await()
                 val hourly = hourlyDeferreds[index].await()
@@ -258,8 +199,17 @@ object Repository {
                     results.add(false)
                 }
             }
-            results
+            Result.success(results)
         }
-        emit(results)
     }
+
+    private fun <T> fire(context: CoroutineContext, block: suspend () -> Result<T>) =
+        liveData(context) {
+            val result = try {
+                block()
+            } catch (e: Exception) {
+                Result.failure<T>(e)
+            }
+            emit(result)
+        }
 }

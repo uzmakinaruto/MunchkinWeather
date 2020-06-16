@@ -90,7 +90,7 @@ class AddLocationFragment : Fragment() {
 
     private fun initDefaultLocations() {
         // val selected = managerLocationActivity.viewModel.locations
-        val selected = managerLocationActivity.viewModel.getLocations()
+        val selected = managerLocationActivity.viewModel.locations
         defaultCities.forEach {
             it.isSelected = selected.contains(it)
         }
@@ -122,7 +122,7 @@ class AddLocationFragment : Fragment() {
     }
 
     private fun initSearchRV() {
-        val locations = managerLocationActivity.viewModel.getLocations()
+        val locations = managerLocationActivity.viewModel.locations
         searchAdapter = SearchPlaceAdapter(viewModel.foundedPlaces)
         recyclerview.adapter = searchAdapter
         recyclerview.layoutManager = LinearLayoutManager(context)
@@ -144,7 +144,7 @@ class AddLocationFragment : Fragment() {
                     }
                 }
             }
-            activity?.setResult(RESULT_OK, Intent().apply { putExtra("position", position) })
+            activity?.setResult(RESULT_OK, Intent().apply { putExtra("currentItem", position) })
             activity?.finish()
         }
     }
@@ -154,5 +154,6 @@ class AddLocationFragment : Fragment() {
         viewModel.foundedPlaces.addAll(places)
         searchAdapter.notifyDataSetChanged()
     }
+    
 
 }

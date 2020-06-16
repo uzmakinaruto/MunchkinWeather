@@ -1,5 +1,7 @@
 package com.hje.jan.munchkinweather.ui.activity
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.net.Uri
@@ -9,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
+import com.hje.jan.munchkinweather.MunchkinWeatherApplication
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.ui.adapter.WeatherViewPagerAdapter
@@ -18,7 +21,7 @@ import com.hje.jan.munchkinweather.util.getVideoNameBySkyCon
 import com.hje.jan.munchkinweather.util.showTransparentStatusBar
 import kotlinx.android.synthetic.main.activity_weather.*
 import kotlinx.android.synthetic.main.titlebar_weather.*
-import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.startActivityForResult
 
 class WeatherActivity : AppCompatActivity() {
 
@@ -35,8 +38,6 @@ class WeatherActivity : AppCompatActivity() {
         initViewPager()
         viewModel.locations.observe(this, Observer { locations ->
             refreshViewPager(locations)
-            Log.d("BootTime", "" + System.currentTimeMillis())
-            Log.d("Observer-1", "" + locations.size)
         })
     }
 
@@ -83,6 +84,7 @@ class WeatherActivity : AppCompatActivity() {
                 //viewModel.currentItem = position
                 val fragment = viewModel.fragments[position]
                 val locations = viewModel.locations.value!!
+                viewModel.currentItem = position
                 clapBoard.alpha = 0f
                 if (locations[0].isLocateEnable) {
                     locationText.text = locations[position].name
@@ -108,14 +110,15 @@ class WeatherActivity : AppCompatActivity() {
 
     private fun initToolbar() {
         managerLocationBtn.setOnClickListener {
-            startActivity<ManagerLocationActivity>()
+            startActivityForResult<ManagerLocationActivity>(0)
         }
     }
 
 
     private fun refreshViewPager(locations: MutableList<LocationItemBean>) {
         if (locations.size == 0 || (locations.size == 1 && !locations[0].isLocateEnable)) {
-            startActivity<ManagerLocationActivity>()
+            MunchkinWeatherApplication.isFirstEnter = false
+            startActivityForResult<ManagerLocationActivity>(0)
         } else {
             viewModel.fragments.clear()
             for (location in locations) {
@@ -124,22 +127,30 @@ class WeatherActivity : AppCompatActivity() {
                     viewModel.fragments.add(fragment)
                 }
             }
-            viewPager.adapter?.notifyDataSetChanged()
-            if (locations[0].isLocateEnable) {
-                locationText.text = locations[viewPager.currentItem].name
-                pageIndicatorView.setIsLocateEnable(true)
-            } else {
-                if (viewPager.currentItem == 0) {
-                    locationText.text = locations[1].name
+            viewPager.postDelayed({
+                viewPager.adapter?.notifyDataSetChanged()
+                if (locations[0].isLocateEnable) {
+                    pageIndicatorView.setIsLocateEnable(true)
+                    if (viewModel.currentItem >= locations.size) {
+                        viewModel.currentItem = locations.size - 1
+                    }
                 } else {
-                    locationText.text = locations[viewPager.currentItem].name
+                    //locationText.text = locations[viewPager.currentItem + 1].name
+                    pageIndicatorView.setIsLocateEnable(false)
+                    if (viewModel.currentItem >= locations.size - 1) {
+                        viewModel.currentItem = locations.size - 2
+                    }
                 }
-                pageIndicatorView.setIsLocateEnable(false)
-            }
+                viewPager.currentItem = viewModel.currentItem
+                if (locations[0].isLocateEnable) {
+                    locationText.text = locations[viewPager.currentItem].name
+                } else {
+                    locationText.text = locations[viewPager.currentItem + 1].name
+                }
+            },50)
 
         }
     }
-
 
     /**为了防止VideoView播放前显示黑色背景 需要在xml设置videoView背景为非透明色*/
     private fun initVideoView() {
@@ -157,19 +168,6 @@ class WeatherActivity : AppCompatActivity() {
         }
     }
 
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onStart() {
-        super.onStart()
-    }
-
     override fun onStop() {
         super.onStop()
         if (videoView.isPlaying) {
@@ -184,6 +182,17 @@ class WeatherActivity : AppCompatActivity() {
 
     fun isCurrentFragment(fragment: WeatherFragment): Boolean {
         return viewModel.fragments[viewPager.currentItem] == fragment
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
+            viewModel.currentItem =
+                data?.getIntExtra("currentItem", viewModel.currentItem) ?: viewModel.currentItem
+            viewPager.postDelayed({
+                viewPager.currentItem = viewModel.currentItem
+            }, 50)
+        }
     }
 
 }

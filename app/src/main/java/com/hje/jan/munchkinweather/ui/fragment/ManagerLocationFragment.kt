@@ -1,6 +1,8 @@
 package com.hje.jan.munchkinweather.ui.fragment
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
@@ -62,7 +64,7 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         super.onActivityCreated(savedInstanceState)
         managerLocationActivity = activity as ManagerLocationActivity
         toolbar.setNavigationOnClickListener {
-            val locations = managerLocationActivity.viewModel.getLocations()
+            val locations = managerLocationActivity.viewModel.locations
             if (locations.size == 0 || (locations.size == 1 && !locations[0].isLocateEnable)
             ) {
                 managerLocationActivity.showAddLocationDialog()
@@ -74,7 +76,7 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
     }
 
     private fun initRecyclerView() {
-        val locations = managerLocationActivity.viewModel.getLocations()
+        val locations = managerLocationActivity.viewModel.locations
         if (locations.isEmpty()) {
             val defaultLocateLocation = LocationItemBean("", "", "", isLocate = true)
             managerLocationActivity.viewModel.addLocationWithoutRefresh(defaultLocateLocation)
@@ -89,6 +91,12 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
             LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         recyclerview.adapter = adapter
         dragHelper.attachToRecyclerView(recyclerview)
+        adapter.onSelectListener = { position ->
+            activity?.setResult(
+                Activity.RESULT_OK,
+                Intent().apply { putExtra("currentItem", position) })
+            activity?.finish()
+        }
         adapter.addLocationListener = {
             managerLocationActivity.startAddLocation()
         }
@@ -119,13 +127,17 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         managerLocationActivity.viewModel.isLocate.observe(
             viewLifecycleOwner,
             Observer { result ->
-                locatingDialog?.dismiss()
-                if (!result) {
-                    toast("请求天气失败,请检查网络是否开启")
+                if (result.getOrNull() != null) {
+                    adapter.notifyDataSetChanged()
+                } else {
+                    toast(result.exceptionOrNull()?.localizedMessage ?: "未知错误")
                 }
-                adapter.notifyDataSetChanged()
-                //managerLocationActivity.viewModel.getLocations()
+                locatingDialog?.dismiss()
             })
+
+        managerLocationActivity.viewModel.weatherUpdate.observe(viewLifecycleOwner, Observer {
+            adapter.notifyDataSetChanged()
+        })
     }
 
 
@@ -139,6 +151,7 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         }
     }
 
+
     private fun startLocation() {
         if (null == locationClient) {
             locationClient = AMapLocationClient(MunchkinWeatherApplication.context).apply {
@@ -151,13 +164,13 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
 
     override fun onLocationChanged(aMapLocation: AMapLocation?) {
         if (aMapLocation != null && aMapLocation.errorCode == 0) {
-            managerLocationActivity.viewModel.getLocations()[0].name = aMapLocation.city
-            managerLocationActivity.viewModel.getLocations()[0].lng =
+            managerLocationActivity.viewModel.locations[0].name = aMapLocation.city
+            managerLocationActivity.viewModel.locations[0].lng =
                 aMapLocation.longitude.toString()
-            managerLocationActivity.viewModel.getLocations()[0].lat =
+            managerLocationActivity.viewModel.locations[0].lat =
                 aMapLocation.latitude.toString()
-            managerLocationActivity.viewModel.updateLocation(managerLocationActivity.viewModel.getLocations()[0])
-            managerLocationActivity.viewModel.getLocateWeatherInfo(managerLocationActivity.viewModel.getLocations()[0])
+            managerLocationActivity.viewModel.updateLocation(managerLocationActivity.viewModel.locations[0])
+            managerLocationActivity.viewModel.getLocateWeatherInfo(managerLocationActivity.viewModel.locations[0])
         } else {
             locatingDialog?.dismiss()
             toast("定位失败,请检查网络与定位开关")

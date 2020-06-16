@@ -21,4 +21,5 @@ class WeatherActivityViewModel : ViewModel() {
     val locations = Repository.locations
     var currentPosition = 0
     var clapBoardAlpha = 0.0f
+    var currentItem = 0
 }

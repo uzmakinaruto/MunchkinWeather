@@ -37,7 +37,9 @@ import org.jetbrains.anko.support.v4.toast
 import org.jetbrains.anko.textColorResource
 import java.util.*
 
-
+/**
+ *具体显示每个地方的天气信息
+ * */
 class WeatherFragment : Fragment() {
     lateinit var hourlyAdapter: HourlyAdapter
     lateinit var dailyAdapter: DailyAdapter
@@ -142,34 +144,21 @@ class WeatherFragment : Fragment() {
         scrollView.setOnScrollChangeListener { _: NestedScrollView?, _: Int, scrollY: Int, _: Int, _: Int ->
             scrollHandler(scrollY)
         }
-        /*viewModel.weatherLiveData.observe(viewLifecycleOwner, Observer { result ->
-            //swipeRefreshLayout.isRefreshing = false
-            refreshLayout.finishRefresh(1000)
-            val weatherResponse = result.getOrNull()
-            if (null != weatherResponse) {
-                Log.d(TAG, weatherResponse.hourly.toString())
-                *//*viewModel.dailyResult = weatherResponse.daily
-                viewModel.hourResult = weatherResponse.hourly
-                viewModel.realtimeResult = weatherResponse.realtime*//*
-                viewModel.location.daily = weatherResponse.daily
-                viewModel.location.hourly = weatherResponse.hourly
-                viewModel.location.realTime = weatherResponse.realtime
-                viewModel.updateLocation()
-                refreshWeatherUI()
-            } else {
-                toast(result.exceptionOrNull()?.localizedMessage ?: "Unknown Exception")
-            }
-        })*/
-        viewModel.isRefresh.observe(viewLifecycleOwner, Observer { results ->
-            refreshLayout.finishRefresh(1000)
-            for ((index, fragment) in weatherActivity.viewModel.fragments.withIndex()) {
-                if (fragment.isVisible) {
-                    if (results[index]) {
-                        fragment.refreshWeatherUI()
-                    } else {
-                        toast("${fragment.viewModel.location.name}获取天气失败")
+        viewModel.isRefresh.observe(viewLifecycleOwner, Observer { it ->
+            refreshLayout.finishRefresh()
+            val results = it.getOrNull()
+            if (results != null) {
+                for ((index, fragment) in weatherActivity.viewModel.fragments.withIndex()) {
+                    if (fragment.isVisible) {
+                        if (results[index]) {
+                            fragment.refreshWeatherUI()
+                        } else {
+                            toast("${fragment.viewModel.location.name}获取天气失败")
+                        }
                     }
                 }
+            } else {
+                toast("获取失败")
             }
         })
 
@@ -294,10 +283,5 @@ class WeatherFragment : Fragment() {
         yesterdayDiff.textColorResource = getSkyConColor(skyCon).first
         forecastText.textColorResource = getSkyConColor(skyCon).first
         forecastRight.textColorResource = getSkyConColor(skyCon).first
-    }
-
-    fun setLocation(locationItemBean: LocationItemBean) {
-        viewModel.location = locationItemBean
-        refreshWeatherUI()
     }
 }

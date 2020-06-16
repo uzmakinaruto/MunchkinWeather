@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.ui.fragment.AddLocationFragment
@@ -14,6 +15,7 @@ import com.hje.jan.munchkinweather.ui.viewmodel.ManagerLocationActivityViewModel
 import com.hje.jan.munchkinweather.util.showTransparentStatusBar
 import kotlinx.android.synthetic.main.alert_dialog_add_location.view.*
 import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.toast
 
 class ManagerLocationActivity : AppCompatActivity() {
 
@@ -32,6 +34,8 @@ class ManagerLocationActivity : AppCompatActivity() {
                 .replace(R.id.container, ManagerLocationFragment.newInstance())
                 .commit()
         }
+        viewModel.weatherUpdate.observe(this, Observer {
+        })
     }
 
     fun startAddLocation() {
@@ -40,19 +44,15 @@ class ManagerLocationActivity : AppCompatActivity() {
             .addToBackStack(null).commit()
     }
 
-
-    /*override fun onBackPressed() {
-        if (viewModel.locations.size == 1 && !viewModel.locations[0].isLocateEnable) {
-            showAddLocationDialog()
-        } else {
-            finish()
-        }
-    }*/
-
     override fun onBackPressed() {
-        val locations = viewModel.getLocations()
-        if (locations.size == 1 && !locations[0].isLocateEnable) {
-            showAddLocationDialog()
+        val current = supportFragmentManager.findFragmentById(R.id.container)
+        if (current is ManagerLocationFragment) {
+            val locations = viewModel.locations
+            if (locations.size == 1 && !locations[0].isLocateEnable) {
+                showAddLocationDialog()
+            } else {
+                super.onBackPressed()
+            }
         } else {
             super.onBackPressed()
         }
