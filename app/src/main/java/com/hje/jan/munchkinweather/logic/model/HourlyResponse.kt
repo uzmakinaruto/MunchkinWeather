@@ -4,6 +4,9 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
+/**
+ * 未来几小时的天气欣喜
+ * */
 data class HourlyResponse(
     val result: Result,
     val status: String

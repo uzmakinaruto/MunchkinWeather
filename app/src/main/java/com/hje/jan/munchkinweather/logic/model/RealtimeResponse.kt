@@ -6,6 +6,9 @@ import com.google.gson.annotations.SerializedName
 import com.hje.jan.munchkinweather.logic.database.converter.*
 import kotlinx.android.parcel.Parcelize
 
+/**
+ * 实时天气信息
+ * */
 data class RealtimeResponse(
     val result: Result,
     val status: String
@@ -32,7 +35,7 @@ data class RealtimeResponse(
         @SerializedName("life_index")
         val lifeIndex: LifeIndex,
         /**降水*/
-        val precipitation: Precipitation,
+        val precipitation: Precipitation?,
         /**气压*/
         val pressure: Double,
         /**主要天气现象*/
@@ -78,8 +81,8 @@ data class RealtimeResponse(
     @Parcelize
     data class Precipitation(
         /**降水*/
-        val local: Local,
-        val nearest: Nearest
+        val local: Local?,
+        val nearest: Nearest?
     ) : Parcelable
 
     @Parcelize

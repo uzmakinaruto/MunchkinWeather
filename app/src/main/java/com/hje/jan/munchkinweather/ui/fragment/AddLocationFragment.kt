@@ -73,14 +73,7 @@ class AddLocationFragment : Fragment() {
                 }
             }
         })
-        managerLocationActivity.viewModel.locationsLiveData.observe(
-            viewLifecycleOwner,
-            Observer { result ->
-                managerLocationActivity.viewModel.locations.clear()
-                managerLocationActivity.viewModel.locations.addAll(result)
-            initDefaultRV()
-        })
-        managerLocationActivity.viewModel.getLocations()
+        initDefaultRV()
     }
 
     private fun initDefaultRV() {
@@ -96,7 +89,8 @@ class AddLocationFragment : Fragment() {
     }
 
     private fun initDefaultLocations() {
-        val selected = managerLocationActivity.viewModel.locations
+        // val selected = managerLocationActivity.viewModel.locations
+        val selected = managerLocationActivity.viewModel.getLocations()
         defaultCities.forEach {
             it.isSelected = selected.contains(it)
         }
@@ -128,19 +122,22 @@ class AddLocationFragment : Fragment() {
     }
 
     private fun initSearchRV() {
+        val locations = managerLocationActivity.viewModel.getLocations()
         searchAdapter = SearchPlaceAdapter(viewModel.foundedPlaces)
         recyclerview.adapter = searchAdapter
         recyclerview.layoutManager = LinearLayoutManager(context)
         searchAdapter.onClickListener = {
             var position = 0
             val location = LocationItemBean(it.name, it.location.lng, it.location.lat)
-            if (!managerLocationActivity.viewModel.locations.contains(location)) {
-                position = managerLocationActivity.viewModel.locations.size
+            if (!locations.contains(location)) {
+                position = locations.size
                 location.position = position
+                //添加location
                 managerLocationActivity.viewModel.addLocation(location)
+                //获取location天气信息
                 managerLocationActivity.viewModel.getLocationWeatherInfo(location)
             } else {
-                managerLocationActivity.viewModel.locations.forEach here@{ item ->
+                locations.forEach here@{ item ->
                     if (item == location) {
                         position = item.position
                         return@here

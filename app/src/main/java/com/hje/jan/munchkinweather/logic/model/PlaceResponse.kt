@@ -5,6 +5,9 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
+/**
+ * 搜索到的地址信息(彩云天气API提供)
+ * */
 data class PlaceResponse(
     val status: String,
     val query: String,

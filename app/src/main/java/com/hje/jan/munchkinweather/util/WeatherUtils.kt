@@ -37,7 +37,6 @@ AQI数值	空气质量等级
 >200	重度污染*/
 
 
-object WeatherUtil {
     val SKYCONS = listOf(
         "CLEAR_DAY",
         "CLEAR_NIGHT",
@@ -63,78 +62,78 @@ object WeatherUtil {
 
     fun getVideoNameBySkyCon(skyCon: String): Int {
         return when (skyCon) {
-            "CLEAR_DAY" -> R.raw.sun
-            "CLEAR_NIGHT" -> R.raw.sun
-            "PARTLY_CLOUDY_DAY" -> R.raw.cloud
-            "PARTLY_CLOUDY_NIGHT" -> R.raw.cloud
-            "CLOUDY" -> R.raw.cloud
-            "LIGHT_HAZE" -> R.raw.haze
-            "MODERATE_HAZE" -> R.raw.haze
-            "HEAVY_HAZE" -> R.raw.haze
-            "LIGHT_RAIN" -> R.raw.rain
-            "MODERATE_RAIN" -> R.raw.rain
-            "HEAVY_RAIN" -> R.raw.rain
-            "STORM_RAIN" -> R.raw.thundershowers
-            "FOG" -> R.raw.fog
-            "LIGHT_SNOW" -> R.raw.snow
-            "MODERATE_SNOW" -> R.raw.snow
-            "HEAVY_SNOW" -> R.raw.snow
-            "STORM_SNOW" -> R.raw.snow
-            "DUST" -> R.raw.sand
-            "SAND" -> R.raw.sand
-            "WIND" -> R.raw.cloud
+            SKYCONS[0] -> R.raw.sun
+            SKYCONS[1] -> R.raw.sun
+            SKYCONS[2] -> R.raw.cloud
+            SKYCONS[3] -> R.raw.cloud
+            SKYCONS[4] -> R.raw.cloud
+            SKYCONS[5] -> R.raw.haze
+            SKYCONS[6] -> R.raw.haze
+            SKYCONS[7] -> R.raw.haze
+            SKYCONS[8] -> R.raw.rain
+            SKYCONS[9] -> R.raw.rain
+            SKYCONS[10] -> R.raw.rain
+            SKYCONS[11] -> R.raw.thundershowers
+            SKYCONS[12] -> R.raw.fog
+            SKYCONS[13] -> R.raw.snow
+            SKYCONS[14] -> R.raw.snow
+            SKYCONS[15] -> R.raw.snow
+            SKYCONS[16] -> R.raw.snow
+            SKYCONS[17] -> R.raw.sand
+            SKYCONS[18] -> R.raw.sand
+            SKYCONS[19] -> R.raw.cloud
             else -> throw RuntimeException("Unknown skyCon")
         }
     }
 
     fun getSkyConDescription(skyCon: String?): String {
         return when (skyCon) {
-            "CLEAR_DAY" -> "晴"
-            "CLEAR_NIGHT" -> "晴"
-            "PARTLY_CLOUDY_DAY" -> "多云"
-            "PARTLY_CLOUDY_NIGHT" -> "多云"
-            "CLOUDY" -> "多云"
-            "LIGHT_HAZE" -> "轻雾霾"
-            "MODERATE_HAZE" -> "中雾霾"
-            "HEAVY_HAZE" -> "重雾霾"
-            "LIGHT_RAIN" -> "小雨"
-            "MODERATE_RAIN" -> "中雨"
-            "HEAVY_RAIN" -> "大雨"
-            "STORM_RAIN" -> "暴雨"
-            "FOG" -> "雾"
-            "LIGHT_SNOW" -> "小雪"
-            "MODERATE_SNOW" -> "中雪"
-            "HEAVY_SNOW" -> "大雪"
-            "STORM_SNOW" -> "暴雪"
-            "DUST" -> "浮尘"
-            "SAND" -> "沙尘"
-            "WIND" -> "大风"
+            SKYCONS[0] -> "晴"
+            SKYCONS[1] -> "晴"
+            SKYCONS[2] -> "多云"
+            SKYCONS[3] -> "多云"
+            SKYCONS[4] -> "多云"
+            SKYCONS[5] -> "轻雾霾"
+            SKYCONS[6] -> "中雾霾"
+            SKYCONS[7] -> "重雾霾"
+            SKYCONS[8] -> "小雨"
+            SKYCONS[9] -> "中雨"
+            SKYCONS[10] -> "大雨"
+            SKYCONS[11] -> "暴雨"
+            SKYCONS[12] -> "雾"
+            SKYCONS[13] -> "小雪"
+            SKYCONS[14] -> "中雪"
+            SKYCONS[15] -> "大雪"
+            SKYCONS[16] -> "暴雪"
+            SKYCONS[17] -> "浮尘"
+            SKYCONS[18] -> "沙尘"
+            SKYCONS[19] -> "大风"
             else -> "N/A"
         }
     }
 
     fun getSkyConImage(skyCon: String?): Int {
         return when (skyCon) {
-            "CLEAR_DAY" -> R.drawable.ic_week_sun
-            "CLEAR_NIGHT" -> R.drawable.ic_week_sun_night
-            "PARTLY_CLOUDY_DAY" -> R.drawable.ic_week_cloudy
-            "PARTLY_CLOUDY_NIGHT" -> R.drawable.ic_week_cloudy_night
-            "CLOUDY" -> R.drawable.ic_week_overcast
-            "LIGHT_HAZE" -> R.drawable.ic_week_haze
-            "MODERATE_HAZE" -> R.drawable.ic_week_haze
-            "HEAVY_HAZE" -> R.drawable.ic_week_haze
-            "LIGHT_RAIN" -> R.drawable.ic_week_light_rain
-            "MODERATE_RAIN" -> R.drawable.ic_week_moderate_rain
-            "HEAVY_RAIN" -> R.drawable.ic_week_heavy_rain
-            "STORM_RAIN" -> R.drawable.ic_week_thunder_rain
-            "FOG" -> R.drawable.ic_week_fog
-            "LIGHT_SNOW" -> R.drawable.ic_week_light_snow
-            "MODERATE_SNOW" -> R.drawable.ic_week_moderate_snow
-            "HEAVY_SNOW" -> R.drawable.ic_week_moderate_snow
-            "STORM_SNOW" -> R.drawable.ic_week_moderate_snow
-            "DUST" -> R.drawable.ic_week_dust
-            "SAND" -> R.drawable.ic_week_dust_storm
-            "WIND" -> R.drawable.ic_week_cloudy
+            SKYCONS[0] -> R.drawable.ic_week_sun
+            SKYCONS[1] -> R.drawable.ic_week_sun_night
+            SKYCONS[2] -> R.drawable.ic_week_cloudy
+            SKYCONS[3] -> R.drawable.ic_week_cloudy_night
+            SKYCONS[4] -> R.drawable.ic_week_overcast
+            SKYCONS[5] -> R.drawable.ic_week_haze
+            SKYCONS[6] -> R.drawable.ic_week_haze
+            SKYCONS[7] -> R.drawable.ic_week_haze
+            SKYCONS[8] -> R.drawable.ic_week_light_rain
+            SKYCONS[9] -> R.drawable.ic_week_moderate_rain
+            SKYCONS[10] -> R.drawable.ic_week_heavy_rain
+            SKYCONS[11] -> R.drawable.ic_week_thunder_rain
+            SKYCONS[12] -> R.drawable.ic_week_fog
+            SKYCONS[13] -> R.drawable.ic_week_light_snow
+            SKYCONS[14] -> R.drawable.ic_week_moderate_snow
+            SKYCONS[15] -> R.drawable.ic_week_moderate_snow
+            SKYCONS[16] -> R.drawable.ic_week_moderate_snow
+            SKYCONS[17] -> R.drawable.ic_week_dust
+            SKYCONS[18] -> R.drawable.ic_week_dust_storm
+            SKYCONS[19] -> R.drawable.ic_week_cloudy
             else -> R.drawable.ic_week_na
         }
     }
@@ -331,4 +330,3 @@ object WeatherUtil {
             else -> R.drawable.shape_degree_rain
         }
     }
-}

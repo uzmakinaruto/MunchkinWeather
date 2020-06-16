@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,9 +25,7 @@ import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import com.hje.jan.munchkinweather.ui.adapter.LocationMoveCallBack
 import com.hje.jan.munchkinweather.ui.adapter.ManagerLocationAdapter
-import kotlinx.android.synthetic.main.alert_dialog_add_location.view.*
 import kotlinx.android.synthetic.main.fragment_manager_location.*
-import kotlinx.android.synthetic.main.item_location_footer.*
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.support.v4.toast
 
@@ -65,9 +62,10 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         super.onActivityCreated(savedInstanceState)
         managerLocationActivity = activity as ManagerLocationActivity
         toolbar.setNavigationOnClickListener {
-            if (managerLocationActivity.viewModel.locations.size == 0 || (managerLocationActivity.viewModel.locations.size == 1 && !managerLocationActivity.viewModel.locations[0].isLocateEnable)
+            val locations = managerLocationActivity.viewModel.getLocations()
+            if (locations.size == 0 || (locations.size == 1 && !locations[0].isLocateEnable)
             ) {
-                showAddLocationDialog()
+                managerLocationActivity.showAddLocationDialog()
             } else {
                 managerLocationActivity.finish()
             }
@@ -76,8 +74,13 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
     }
 
     private fun initRecyclerView() {
+        val locations = managerLocationActivity.viewModel.getLocations()
+        if (locations.isEmpty()) {
+            val defaultLocateLocation = LocationItemBean("", "", "", isLocate = true)
+            managerLocationActivity.viewModel.addLocationWithoutRefresh(defaultLocateLocation)
+        }
         adapter = ManagerLocationAdapter(
-            managerLocationActivity.viewModel.locations,
+            locations,
             managerLocationActivity
         )
         dragHelper = ItemTouchHelper(LocationMoveCallBack(adapter))
@@ -120,49 +123,11 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
                 if (!result) {
                     toast("请求天气失败,请检查网络是否开启")
                 }
-                managerLocationActivity.viewModel.getLocations()
-            })
-        managerLocationActivity.viewModel.locationsLiveData.observe(
-            viewLifecycleOwner,
-            Observer { locations ->
-                managerLocationActivity.viewModel.locations.clear()
-                managerLocationActivity.viewModel.locations.addAll(locations)
-                if (locations.isEmpty()) {
-                    val defaultLocateLocation = LocationItemBean("", "", "", isLocate = true)
-                    managerLocationActivity.viewModel.locations.add(defaultLocateLocation)
-                    managerLocationActivity.viewModel.addLocation(defaultLocateLocation)
-                }
                 adapter.notifyDataSetChanged()
-                recyclerview.post {
-                    if (recyclerview.height > recyclerview.computeVerticalScrollRange()) {
-                        footer.visibility = View.GONE
-                    } else {
-                        footer.visibility = View.VISIBLE
-                        addLocation.setOnClickListener {
-                            managerLocationActivity.startAddLocation()
-                        }
-                    }
-                }
+                //managerLocationActivity.viewModel.getLocations()
             })
-        managerLocationActivity.viewModel.getLocations()
     }
 
-    override fun onPause() {
-        super.onPause()/*
-        for ((index, location) in managerLocationActivity.viewModel.locations.withIndex()) {
-            location.position = index
-            managerLocationActivity.viewModel.updateLocation(location)
-        }*/
-        /**只有两个以上地址才进行交换*/
-        if (managerLocationActivity.viewModel.locations.size > 2) {
-            /**定位地址不能交换*/
-            for (index in 1 until managerLocationActivity.viewModel.locations.size) {
-                val location = managerLocationActivity.viewModel.locations[index]
-                location.position = index
-                managerLocationActivity.viewModel.updateLocation(location)
-            }
-        }
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -186,7 +151,13 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
 
     override fun onLocationChanged(aMapLocation: AMapLocation?) {
         if (aMapLocation != null && aMapLocation.errorCode == 0) {
-            managerLocationActivity.viewModel.setLocateLocation(aMapLocation)
+            managerLocationActivity.viewModel.getLocations()[0].name = aMapLocation.city
+            managerLocationActivity.viewModel.getLocations()[0].lng =
+                aMapLocation.longitude.toString()
+            managerLocationActivity.viewModel.getLocations()[0].lat =
+                aMapLocation.latitude.toString()
+            managerLocationActivity.viewModel.updateLocation(managerLocationActivity.viewModel.getLocations()[0])
+            managerLocationActivity.viewModel.getLocateWeatherInfo(managerLocationActivity.viewModel.getLocations()[0])
         } else {
             locatingDialog?.dismiss()
             toast("定位失败,请检查网络与定位开关")
@@ -194,21 +165,6 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
         locationClient?.stopLocation()
     }
 
-
-    /**设置对话框宽高、位置等属性需要在对话框show后才能设置*/
-    private fun showAddLocationDialog() {
-        val root = View.inflate(managerLocationActivity, R.layout.alert_dialog_add_location, null)
-        val dialog =
-            AlertDialog.Builder(managerLocationActivity)
-                .setView(root).setCancelable(false).create()
-        root.okBtn.setOnClickListener { dialog.dismiss() }
-        dialog.show()
-        val params = dialog.window?.attributes
-        params?.y = 150
-        params?.gravity = Gravity.BOTTOM
-        dialog.window?.attributes = params
-        dialog.window?.decorView?.backgroundColor = Color.TRANSPARENT
-    }
 
     private fun showLocatingDialog() {
         if (null == locatingDialog) {
@@ -227,4 +183,5 @@ class ManagerLocationFragment : Fragment(), AMapLocationListener {
             locatingDialog?.show()
         }
     }
+
 }

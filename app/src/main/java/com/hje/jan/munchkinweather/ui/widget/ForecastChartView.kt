@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.model.DailyResponse
-import com.hje.jan.munchkinweather.util.WeatherUtil
+import com.hje.jan.munchkinweather.util.*
 import kotlinx.android.synthetic.main.item_forecast_daily.view.*
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.imageResource
@@ -60,21 +60,21 @@ class ForecastChartView : LinearLayout {
             item.backgroundResource = R.drawable.shape_chart_even
         else
             item.backgroundResource = R.drawable.shape_chart_odd
-        item.weekText.text = WeatherUtil.getWeekString(index)
+        item.weekText.text = getWeekString(index)
         daily.temperature[index].date.split("T")[0].split("-").apply {
             item.dateText.text = "${get(1)}/${get(2)}"
         }
         item.daySkyConImage.imageResource =
-            WeatherUtil.getSkyConImage(daily.skycon_08h_20h[index].value)
+            getSkyConImage(daily.skycon_08h_20h[index].value)
         item.daySkyConText.text =
-            WeatherUtil.getSkyConDescription(daily.skycon_08h_20h[index].value)
+            getSkyConDescription(daily.skycon_08h_20h[index].value)
         item.nightSkyConImage.imageResource =
-            WeatherUtil.getSkyConImage(daily.skycon_20h_32h[index].value)
+            getSkyConImage(daily.skycon_20h_32h[index].value)
         item.nightSkyConText.text =
-            WeatherUtil.getSkyConDescription(daily.skycon_20h_32h[index].value)
-        item.windLevel.text = "${WeatherUtil.getWindLevel(daily.wind[index].avg.speed)}级"
+            getSkyConDescription(daily.skycon_20h_32h[index].value)
+        item.windLevel.text = "${getWindLevel(daily.wind[index].avg.speed)}级"
         item.windDirection.text =
-            WeatherUtil.getWindDirectionString(daily.wind[index].avg.direction)
+            getWindDirectionString(daily.wind[index].avg.direction)
         addView(item)
     }
 
@@ -114,11 +114,12 @@ class ForecastChartView : LinearLayout {
                     cX.toFloat(), c1Y.toFloat(), cX.toFloat(), c2Y.toFloat(), endX.toFloat(),
                     endY.toFloat()
                 )
+                paint.style = Paint.Style.FILL
                 paint.strokeWidth = 1f
                 val bound = Rect()
                 var text: String
                 if (isMaxTemp) {
-                    text = "${daily.temperature[index].max}°"
+                    text = "${daily.temperature[index].max.toInt()}°"
                     paint.getTextBounds(text, 0, text.length, bound)
                     canvas?.drawText(
                         text,
@@ -127,7 +128,7 @@ class ForecastChartView : LinearLayout {
                         paint
                     )
                 } else {
-                    text = "${daily.temperature[index].min}°"
+                    text = "${daily.temperature[index].min.toInt()}°"
                     paint.getTextBounds(text, 0, text.length, bound)
                     canvas?.drawText(
                         text,
@@ -137,6 +138,7 @@ class ForecastChartView : LinearLayout {
                     )
                 }
             }
+            paint.style = Paint.Style.STROKE
             paint.strokeWidth = 5f
             canvas?.drawPath(path, paint)
         }

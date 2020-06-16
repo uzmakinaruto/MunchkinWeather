@@ -6,7 +6,9 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.model.HourlyResponse
-import com.hje.jan.munchkinweather.util.WeatherUtil
+import com.hje.jan.munchkinweather.util.getSkyConColor
+import com.hje.jan.munchkinweather.util.getSkyConDescription
+import com.hje.jan.munchkinweather.util.getSkyConImage
 import kotlinx.android.synthetic.main.item_hourly.view.*
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColorResource
@@ -15,15 +17,15 @@ class HourlyItemView : RelativeLayout {
     fun bindData(hourlyResult: HourlyResponse.Hourly, position: Int) {
         tempText.text = "${hourlyResult.temperature[position].value.toInt()}"
         tempText.textColorResource =
-            WeatherUtil.getSkyConColor(hourlyResult.skyCon[0].value).first
+            getSkyConColor(hourlyResult.skyCon[0].value).first
         degree.textColorResource =
-            WeatherUtil.getSkyConColor(hourlyResult.skyCon[position].value).first
-        skyConText.text = WeatherUtil.getSkyConDescription(hourlyResult.skyCon[position].value)
+            getSkyConColor(hourlyResult.skyCon[position].value).first
+        skyConText.text = getSkyConDescription(hourlyResult.skyCon[position].value)
         val timeString =
             hourlyResult.temperature[position].datetime
                 .split("T")[1].split("+")[0]
         timeText.text = timeString
-        skyConImage.imageResource = WeatherUtil.getSkyConImage(hourlyResult.skyCon[position].value)
+        skyConImage.imageResource = getSkyConImage(hourlyResult.skyCon[position].value)
 
     }
 

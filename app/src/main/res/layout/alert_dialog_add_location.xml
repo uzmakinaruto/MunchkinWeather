@@ -19,7 +19,7 @@
             android:gravity="center_horizontal"
             android:text="请先添加一个城市"
             android:textColor="@android:color/black"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/okBtn"
@@ -35,7 +35,7 @@
             android:paddingBottom="16dp"
             android:text="确定"
             android:textColor="#1296db"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
 

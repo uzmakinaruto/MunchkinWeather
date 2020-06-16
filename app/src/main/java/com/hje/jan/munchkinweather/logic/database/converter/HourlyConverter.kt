@@ -5,7 +5,9 @@ import com.google.gson.Gson
 import com.hje.jan.munchkinweather.logic.model.DailyResponse
 import com.hje.jan.munchkinweather.logic.model.HourlyResponse
 
-
+/**
+ *Room不支持非基本类型 为每个非基本类型数据添加Converter
+ */
 class HourlyConverter {
     var gson = Gson()
     @TypeConverter

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.model.DailyResponse
+import com.hje.jan.munchkinweather.util.showTransparentStatusBar
 import kotlinx.android.synthetic.main.activity_forecast.*
 
 class ForecastActivity : AppCompatActivity() {
@@ -11,6 +12,7 @@ class ForecastActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forecast)
+        showTransparentStatusBar (this)
         val dailyResponse = intent.getParcelableExtra<DailyResponse.Daily>("forecast")
         dailyResponse?.let {
             forecastChartView.setData(dailyResponse)

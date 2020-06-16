@@ -6,18 +6,20 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.model.DailyResponse
-import com.hje.jan.munchkinweather.util.WeatherUtil
+import com.hje.jan.munchkinweather.util.getSkyConDescription
+import com.hje.jan.munchkinweather.util.getSkyConImage
+import com.hje.jan.munchkinweather.util.getWeekString
 import kotlinx.android.synthetic.main.item_daily.view.*
 import org.jetbrains.anko.imageResource
 
 class DailyItemView : RelativeLayout {
     fun bindData(dailyResult: DailyResponse.Daily, position: Int) {
-        dayOfWeekText.text = WeatherUtil.getWeekString(position)
+        dayOfWeekText.text = getWeekString(position)
         dailyResult.temperature[position].date.split("T")[0].split("-").apply {
             dateText.text = "${get(1)}/${get(2)}"
         }
-        skyConImage.imageResource = WeatherUtil.getSkyConImage(dailyResult.skyCon[position].value)
-        skyConText.text = WeatherUtil.getSkyConDescription(dailyResult.skyCon[position].value)
+        skyConImage.imageResource = getSkyConImage(dailyResult.skyCon[position].value)
+        skyConText.text = getSkyConDescription(dailyResult.skyCon[position].value)
         minTempText.text = "${dailyResult.temperature[position].min.toInt()}°"
         maxTempText.text = "${dailyResult.temperature[position].max.toInt()}°"
     }

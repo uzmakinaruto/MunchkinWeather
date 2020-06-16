@@ -10,6 +10,9 @@ import com.hje.jan.munchkinweather.logic.model.HourlyResponse
 import com.hje.jan.munchkinweather.logic.model.RealtimeResponse
 import kotlinx.android.parcel.Parcelize
 
+/**
+ * 地点的bean类
+ */
 @Entity
 @Parcelize
 data class LocationItemBean(

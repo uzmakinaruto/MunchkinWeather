@@ -9,6 +9,9 @@ import com.hje.jan.munchkinweather.logic.database.converter.DailyConverter
 import com.hje.jan.munchkinweather.logic.database.converter.HourlyConverter
 import com.hje.jan.munchkinweather.logic.database.converter.RealtimeConverter
 
+/**
+ * 用于数据库的创建与更新 dao类的生成
+ * */
 @Database(version = 1, entities = [LocationItemBean::class])
 @TypeConverters(RealtimeConverter::class, DailyConverter::class, HourlyConverter::class)
 abstract class MunchkinWeatherDataBase : RoomDatabase() {

@@ -6,7 +6,8 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
-import com.hje.jan.munchkinweather.util.WeatherUtil
+import com.hje.jan.munchkinweather.util.getSkyConDescription
+import com.hje.jan.munchkinweather.util.getSkyConImage
 import kotlinx.android.synthetic.main.item_location.view.*
 import org.jetbrains.anko.imageResource
 
@@ -14,7 +15,7 @@ class LocationItemView : RelativeLayout {
     fun bindData(location: LocationItemBean) {
         locationText.text = location.name
         //skyConImage.imageResource = WeatherUtil.getSkyConImage(location.skyCon)
-        skyConImage.imageResource = WeatherUtil.getSkyConImage(location.realTime?.skycon)
+        skyConImage.imageResource = getSkyConImage(location.realTime?.skycon)
         /*if (null == location.temp) tempText.text = "N/A"
         else tempText.text = "${location.temp}℃"*/
         //skyConText.text = WeatherUtil.getSkyConDescription(location.skyCon)
@@ -23,7 +24,7 @@ class LocationItemView : RelativeLayout {
             skyConText.text = "N/A"
         } else {
             tempText.text = "${location.realTime!!.temperature.toInt()}℃"
-            skyConText.text = WeatherUtil.getSkyConDescription(location.realTime?.skycon)
+            skyConText.text = getSkyConDescription(location.realTime?.skycon)
         }
     }
 

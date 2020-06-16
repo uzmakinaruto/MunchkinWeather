@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hje.jan.munchkinweather.MunchkinWeatherApplication
 import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.extension.dp
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
@@ -24,7 +25,7 @@ import com.hje.jan.munchkinweather.ui.activity.WeatherActivity
 import com.hje.jan.munchkinweather.ui.adapter.DailyAdapter
 import com.hje.jan.munchkinweather.ui.adapter.HourlyAdapter
 import com.hje.jan.munchkinweather.ui.viewmodel.WeatherFragmentViewModel
-import com.hje.jan.munchkinweather.util.WeatherUtil
+import com.hje.jan.munchkinweather.util.*
 import kotlinx.android.synthetic.main.activity_weather.*
 import kotlinx.android.synthetic.main.fragment_weather.*
 import kotlinx.android.synthetic.main.section_weather_detail.*
@@ -83,6 +84,9 @@ class WeatherFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        if (viewModel.location.realTime != null) {
+            weatherActivity.videoView.start()
+        }
         Log.d(TAG, "onResume-${viewModel.location.name}")
     }
 
@@ -138,15 +142,15 @@ class WeatherFragment : Fragment() {
         scrollView.setOnScrollChangeListener { _: NestedScrollView?, _: Int, scrollY: Int, _: Int, _: Int ->
             scrollHandler(scrollY)
         }
-        viewModel.weatherLiveData.observe(viewLifecycleOwner, Observer { result ->
+        /*viewModel.weatherLiveData.observe(viewLifecycleOwner, Observer { result ->
             //swipeRefreshLayout.isRefreshing = false
             refreshLayout.finishRefresh(1000)
             val weatherResponse = result.getOrNull()
             if (null != weatherResponse) {
                 Log.d(TAG, weatherResponse.hourly.toString())
-                /*viewModel.dailyResult = weatherResponse.daily
+                *//*viewModel.dailyResult = weatherResponse.daily
                 viewModel.hourResult = weatherResponse.hourly
-                viewModel.realtimeResult = weatherResponse.realtime*/
+                viewModel.realtimeResult = weatherResponse.realtime*//*
                 viewModel.location.daily = weatherResponse.daily
                 viewModel.location.hourly = weatherResponse.hourly
                 viewModel.location.realTime = weatherResponse.realtime
@@ -155,7 +159,20 @@ class WeatherFragment : Fragment() {
             } else {
                 toast(result.exceptionOrNull()?.localizedMessage ?: "Unknown Exception")
             }
+        })*/
+        viewModel.isRefresh.observe(viewLifecycleOwner, Observer { results ->
+            refreshLayout.finishRefresh(1000)
+            for ((index, fragment) in weatherActivity.viewModel.fragments.withIndex()) {
+                if (fragment.isVisible) {
+                    if (results[index]) {
+                        fragment.refreshWeatherUI()
+                    } else {
+                        toast("${fragment.viewModel.location.name}获取天气失败")
+                    }
+                }
+            }
         })
+
         hourlyAdapter = HourlyAdapter(viewModel.location.hourly)
         hourlyRV.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
         hourlyRV.adapter = hourlyAdapter
@@ -177,14 +194,15 @@ class WeatherFragment : Fragment() {
         }
 
         refreshLayout.setOnRefreshListener {
-            viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
+            //viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
+            refreshWeathers()
         }
-        if (viewModel.location.realTime == null) {
-            viewModel.refreshWeather(viewModel.location.lng, viewModel.location.lat)
-        } else {
             refreshWeatherUI()
-        }
+    }
 
+
+    private fun refreshWeathers() {
+        viewModel.refreshWeathers()
     }
 
     private fun refreshWeatherUI() {
@@ -201,13 +219,13 @@ class WeatherFragment : Fragment() {
         viewModel.location.realTime?.let {
             weatherInfo.visibility = View.VISIBLE
             setSkyConColor(it.skycon)
-            degree.imageResource = WeatherUtil.getDegreeColor(it.skycon)
-            skyConText.text = WeatherUtil.getSkyConDescription(it.skycon)
+            degree.imageResource = getDegreeColor(it.skycon)
+            skyConText.text = getSkyConDescription(it.skycon)
             tempText.text = it.temperature.toInt().toString()
             aqiStatus.text = it.airQuality.description.chn
             aqiValue.text = it.airQuality.aqi.chn.toString()
-            windLevel.text = WeatherUtil.getWindLevel(it.wind.speed).toString()
-            windDirection.text = WeatherUtil.getWindDirectionString(it.wind.direction)
+            windLevel.text = getWindLevel(it.wind.speed).toString()
+            windDirection.text = getWindDirectionString(it.wind.direction)
             humidity.text = (it.humidity * 100).toInt().toString()
             apparentTemp.text = it.apparentTemperature.toInt().toString()
             pressure.text = (it.pressure / 100).toInt().toString()
@@ -217,7 +235,7 @@ class WeatherFragment : Fragment() {
                     Calendar.DAY_OF_MONTH
                 )}日"
             dayOfWeekText.text =
-                WeatherUtil.getDayOfWeek(Calendar.getInstance().get(Calendar.DAY_OF_WEEK))
+                getDayOfWeek(Calendar.getInstance().get(Calendar.DAY_OF_WEEK))
             ultravioletIndex.text = it.lifeIndex.ultraviolet.desc
             comfortIndex.text = it.lifeIndex.comfort.desc
             visibilityIndex.text = "${it.visibility.toInt()}公里"
@@ -227,7 +245,7 @@ class WeatherFragment : Fragment() {
                 weatherActivity.titleBarTempText.text = "${it.temperature.toInt()}°"
                 weatherActivity.videoView.setVideoURI(
                     Uri.parse(
-                        "android.resource://${weatherActivity.packageName}/${WeatherUtil.getVideoNameBySkyCon(
+                        "android.resource://${weatherActivity.packageName}/${getVideoNameBySkyCon(
                             it.skycon
                         )}"
                     )
@@ -238,6 +256,12 @@ class WeatherFragment : Fragment() {
                 }
             }
         }
+        refreshLayout.postDelayed({
+            if (MunchkinWeatherApplication.isFirstEnter && weatherActivity.isCurrentFragment(this)) {
+                MunchkinWeatherApplication.isFirstEnter = false
+                refreshLayout.autoRefresh()
+            }
+        }, 200)
     }
 
     fun getCurrentTemp(): String {
@@ -261,14 +285,19 @@ class WeatherFragment : Fragment() {
     }
 
     private fun setSkyConColor(skyCon: String) {
-        tempText.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
-        skyConText.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
-        divider.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
-        aqiStatus.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
-        aqiValue.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
-        right.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
-        yesterdayDiff.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
-        forecastText.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
-        forecastRight.textColorResource = WeatherUtil.getSkyConColor(skyCon).first
+        tempText.textColorResource = getSkyConColor(skyCon).first
+        skyConText.textColorResource = getSkyConColor(skyCon).first
+        divider.textColorResource = getSkyConColor(skyCon).first
+        aqiStatus.textColorResource = getSkyConColor(skyCon).first
+        aqiValue.textColorResource = getSkyConColor(skyCon).first
+        right.textColorResource = getSkyConColor(skyCon).first
+        yesterdayDiff.textColorResource = getSkyConColor(skyCon).first
+        forecastText.textColorResource = getSkyConColor(skyCon).first
+        forecastRight.textColorResource = getSkyConColor(skyCon).first
+    }
+
+    fun setLocation(locationItemBean: LocationItemBean) {
+        viewModel.location = locationItemBean
+        refreshWeatherUI()
     }
 }

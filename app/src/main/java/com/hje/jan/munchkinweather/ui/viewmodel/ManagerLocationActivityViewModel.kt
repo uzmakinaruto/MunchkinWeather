@@ -6,62 +6,71 @@ import androidx.lifecycle.ViewModel
 import com.amap.api.location.AMapLocation
 import com.hje.jan.munchkinweather.logic.Repository
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 class ManagerLocationActivityViewModel : ViewModel() {
 
-    private val _isLocate = MutableLiveData<AMapLocation>()
-    private val _locations = MutableLiveData<Any?>()
-    private val job = Job()
+    private val _isLocate = MutableLiveData<LocationItemBean>()
+    //private val _locations = MutableLiveData<Any?>()
 
-    val locationsLiveData = Transformations.switchMap(_locations) {
-        Repository.getLocations()
+    val isLocate = Transformations.switchMap(_isLocate) { locateLoaction ->
+        Repository.getLocateWeatherInfo(locateLoaction)
     }
 
-    val isLocate = Transformations.switchMap(_isLocate) {
-        Repository.setLocateLocation(it.city, it.longitude.toString(), it.latitude.toString())
-    }
-    fun getLocations() {
-        _locations.value = _locations.value
-    }
 
-    val locations = mutableListOf<LocationItemBean>()
-    /**添加地址到数据库*/
+    //val locations = Repository.locations.value!!
+    /**添加地址*/
     fun addLocation(location: LocationItemBean) {
-        CoroutineScope(job).launch {
-            Repository.addLocation(location)
-        }
+        //添加到livedata
+        Repository.locations.value?.add(location)
+        //刷新livedata
+        Repository.refreshLocations()
+        //添加到数据库
+        Repository.addLocation(location)
+    }
+
+    //val locations = Repository.locations.value!!
+    /**添加地址*/
+    fun addLocationWithoutRefresh(location: LocationItemBean) {
+        //添加到livedata
+        Repository.locations.value?.add(location)
+        //添加到数据库
+        Repository.addLocation(location)
     }
 
     fun getLocationWeatherInfo(location: LocationItemBean) {
-        CoroutineScope(job).launch {
-            Repository.getLocationWeatherInfo(location)
-        }
+        Repository.getLocationWeatherInfo(location)
     }
 
-
-    /**从数据库中删除地址*/
-    fun deleteLocation(name: String) {
-        CoroutineScope(job).launch {
-            Repository.deleteLocation(name)
-        }
+    /**删除地址*/
+    fun deleteLocation(location: LocationItemBean) {
+        //从livedata删除
+        Repository.locations.value?.remove(location)
+        //刷新livedata
+        Repository.refreshLocations()
+        //从数据库删除
+        Repository.deleteLocation(location.name)
     }
 
 
     fun updateLocation(location: LocationItemBean) {
-        CoroutineScope(job).launch {
-            Repository.updateLocation(location)
+        //刷新liveData
+        Repository.refreshLocations()
+        //更新数据库
+        Repository.updateLocation(location)
+    }
+
+    fun getLocateWeatherInfo(locateLocation: LocationItemBean) {
+        _isLocate.value = locateLocation
+    }
+
+    fun updateLocateLocation(aMapLocation: AMapLocation) {
+        Repository.locations.value?.let { locations ->
+            locations[0].name = aMapLocation.city
+            locations[0].lng = aMapLocation.longitude.toString()
+            locations[0].lat = aMapLocation.latitude.toString()
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        job.cancel()
-    }
-
-    fun setLocateLocation(aMapLocation: AMapLocation) {
-        _isLocate.value = aMapLocation
-    }
+    fun getLocations() = Repository.locations.value!!
+    fun refreshLocations() = Repository.refreshLocations()
 }

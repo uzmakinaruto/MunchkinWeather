@@ -4,26 +4,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.hje.jan.munchkinweather.logic.Repository
-import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.ui.fragment.WeatherFragment
 
 class WeatherActivityViewModel : ViewModel() {
 
+    private val _isRefresh = MutableLiveData<Unit>()
+    val isRefresh = Transformations.switchMap(_isRefresh) {
+        Repository.refreshWeathers()
+    }
+
+    fun refreshWeathers() {
+        _isRefresh.value = _isRefresh.value
+    }
+
     val fragments = mutableListOf<WeatherFragment>()
-
-    private val _selectedLocations = MutableLiveData<Unit>()
-
-    val selectLocations = Transformations.switchMap(_selectedLocations) {
-        Repository.getLocations()
-    }
-
-    fun refreshLocations() {
-        _selectedLocations.value = _selectedLocations.value
-    }
-
-    val locations: MutableList<LocationItemBean> = mutableListOf()
-
+    val locations = Repository.locations
     var currentPosition = 0
-    var currentItem = 0
     var clapBoardAlpha = 0.0f
 }

@@ -9,16 +9,26 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+/**
+ * 查询天气的retrofit接口
+ * */
 interface WeatherService {
 
+    /**
+     * 查询实时天气
+     * */
     @GET("/v2.5/${MunchkinWeatherApplication.TOKEN}/{lng},{lat}/realtime.json")
     fun getRealtimeResponse(@Path("lng") lat: String, @Path("lat") lng: String): Call<RealtimeResponse>
 
-    /*@GET("/v2.5/${MunchkinWeatherApplication.TOKEN}/{lng},{lat}/daily.json")
-    fun getDailyResponse(@Path("lng") lat: String, @Path("lat") lng: String): Call<DailyResponse>*/
-
+    /**
+     * 查询未来几天天气
+     * */
     @GET("/v2.5/${MunchkinWeatherApplication.TOKEN}/{lng},{lat}/daily.json")
     fun getDailyResponse(@Path("lng") lat: String, @Path("lat") lng: String, @Query("dailysteps") requestDay: Int): Call<DailyResponse>
+
+    /**
+     * 查询未来几小时天气
+     * */
     @GET("/v2.5/${MunchkinWeatherApplication.TOKEN}/{lng},{lat}/hourly.json")
     fun getHourlyResponse(@Path("lng") lat: String, @Path("lat") lng: String): Call<HourlyResponse>
 }

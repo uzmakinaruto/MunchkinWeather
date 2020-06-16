@@ -3,6 +3,9 @@ package com.hje.jan.munchkinweather.util
 import android.content.Context
 import com.hje.jan.munchkinweather.MunchkinWeatherApplication
 
+/**
+ * SharedPreference工具类
+ * */
 object PreferenceUtils {
     val preference by lazy {
         MunchkinWeatherApplication.context.getSharedPreferences(

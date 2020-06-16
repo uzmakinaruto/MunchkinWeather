@@ -2,6 +2,9 @@ package com.hje.jan.munchkinweather.logic.model
 
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 
+/**
+ *定义固定的地点信息
+ * */
 object DefaultLocations {
 
     val CITIES = listOf<LocationItemBean>(

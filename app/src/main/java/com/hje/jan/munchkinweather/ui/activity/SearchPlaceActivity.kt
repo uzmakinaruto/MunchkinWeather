@@ -12,7 +12,7 @@ import com.hje.jan.munchkinweather.logic.model.PlaceResponse
 import com.hje.jan.munchkinweather.ui.adapter.SearchPlaceAdapter
 import com.hje.jan.munchkinweather.ui.adapter.SearchTextChangeAdapter
 import com.hje.jan.munchkinweather.ui.viewmodel.AddLocationFragmentViewModel
-import com.hje.jan.munchkinweather.util.WindowUtil
+import com.hje.jan.munchkinweather.util.showTransparentStatusBar
 import kotlinx.android.synthetic.main.activity_search_place.*
 import kotlinx.android.synthetic.main.titlebar_search.*
 import org.jetbrains.anko.startActivity
@@ -28,7 +28,7 @@ class SearchPlaceActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_place)
-        WindowUtil.showTransparentStatusBar(this)
+        showTransparentStatusBar(this)
         initRecyclerView()
         initTitleBar()
         viewModel.places.observe(this, Observer { result ->

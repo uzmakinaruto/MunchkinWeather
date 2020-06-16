@@ -10,8 +10,9 @@ import com.hje.jan.munchkinweather.R
 import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.ui.activity.ManagerLocationActivity
 import com.hje.jan.munchkinweather.ui.widget.LocationItemView
-import com.hje.jan.munchkinweather.util.AvoidDoubleClickUtil
-import com.hje.jan.munchkinweather.util.WeatherUtil
+import com.hje.jan.munchkinweather.util.getSkyConDescription
+import com.hje.jan.munchkinweather.util.getSkyConImage
+import com.hje.jan.munchkinweather.util.isAvoidedDoubleClick
 import kotlinx.android.synthetic.main.item_location.view.*
 import kotlinx.android.synthetic.main.item_location_footer.view.*
 import kotlinx.android.synthetic.main.item_location_header.view.*
@@ -76,9 +77,8 @@ class ManagerLocationAdapter(
                 val itemView = LocationItemView(parent.context)
                 holder = ViewHolder(itemView)
                 itemView.removeLocation.setOnClickListener {
-                    if (AvoidDoubleClickUtil.isClickable()) {
-                        activity.viewModel.deleteLocation(locations[holder.adapterPosition].name)
-                        locations.removeAt(holder.adapterPosition)
+                    if (isAvoidedDoubleClick()) {
+                        activity.viewModel.deleteLocation(locations[holder.adapterPosition])
                         notifyDataSetChanged()
                         deleteLocationListener?.invoke()
                     }
@@ -118,10 +118,10 @@ class ManagerLocationAdapter(
                     //header.temp.text = "${location.temp}℃"
                     header.temp.text = "${location.realTime?.temperature?.toInt()}℃"
                     //header.scText.text = WeatherUtil.getSkyConDescription(location.skyCon)
-                    header.scText.text = WeatherUtil.getSkyConDescription(location.realTime?.skycon)
+                    header.scText.text = getSkyConDescription(location.realTime?.skycon)
                     //header.scImage.imageResource = WeatherUtil.getSkyConImage(location.skyCon)
                     header.scImage.imageResource =
-                        WeatherUtil.getSkyConImage(location.realTime?.skycon)
+                        getSkyConImage(location.realTime?.skycon)
                     header.locateSwitch.isChecked = true
                 } else {
                     header.weatherLayout.visibility = View.GONE
@@ -135,6 +135,10 @@ class ManagerLocationAdapter(
 
     fun onMove(fromPosition: Int, toPosition: Int) {
         Collections.swap(locations, fromPosition, toPosition)
+        locations[fromPosition].position = toPosition
+        locations[toPosition].position = fromPosition
+        activity.viewModel.updateLocation(locations[fromPosition])
+        activity.viewModel.updateLocation(locations[toPosition])
         notifyItemMoved(fromPosition, toPosition)
     }
 

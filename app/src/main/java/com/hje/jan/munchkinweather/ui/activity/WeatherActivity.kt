@@ -1,7 +1,5 @@
 package com.hje.jan.munchkinweather.ui.activity
 
-import android.app.Activity
-import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.net.Uri
@@ -12,11 +10,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import com.hje.jan.munchkinweather.R
+import com.hje.jan.munchkinweather.logic.database.LocationItemBean
 import com.hje.jan.munchkinweather.ui.adapter.WeatherViewPagerAdapter
 import com.hje.jan.munchkinweather.ui.fragment.WeatherFragment
 import com.hje.jan.munchkinweather.ui.viewmodel.WeatherActivityViewModel
-import com.hje.jan.munchkinweather.util.WeatherUtil
-import com.hje.jan.munchkinweather.util.WindowUtil
+import com.hje.jan.munchkinweather.util.getVideoNameBySkyCon
+import com.hje.jan.munchkinweather.util.showTransparentStatusBar
 import kotlinx.android.synthetic.main.activity_weather.*
 import kotlinx.android.synthetic.main.titlebar_weather.*
 import org.jetbrains.anko.startActivity
@@ -30,46 +29,18 @@ class WeatherActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
-        WindowUtil.showTransparentStatusBar(this)
+        showTransparentStatusBar(this)
+        initToolbar()
         initVideoView()
         initViewPager()
-        initToolbar()
-    }
-
-    private fun initToolbar() {
-        managerLocationBtn.setOnClickListener {
-            startActivityForResult(Intent(this, ManagerLocationActivity::class.java), 0)
-        }
+        viewModel.locations.observe(this, Observer { locations ->
+            refreshViewPager(locations)
+            Log.d("BootTime", "" + System.currentTimeMillis())
+            Log.d("Observer-1", "" + locations.size)
+        })
     }
 
     private fun initViewPager() {
-        viewModel.selectLocations.observe(this, Observer { locations ->
-            /**启动若没有记录的地址,跳到ManagerLocationActivity*/
-            if (locations.size == 0 || (locations.size == 1 && !locations[0].isLocateEnable)) {
-                startActivity<ManagerLocationActivity>()
-            } else {
-                viewModel.locations.clear()
-                viewModel.fragments.clear()
-                for (location in locations) {
-                    if (!location.isLocate || (location.isLocate && location.isLocateEnable)) {
-                        viewModel.locations.add(location)
-                        val fragment = WeatherFragment.newInstance(location)
-                        viewModel.fragments.add(fragment)
-                    }
-                }
-                viewPager.adapter?.notifyDataSetChanged()
-                locationText.text = viewModel.locations[viewPager.currentItem].name
-                viewPager.currentItem = viewModel.currentItem
-                if(locations[0].isLocateEnable){
-                    pageIndicatorView.setIsLocateEnable(true)
-                }else{
-                    pageIndicatorView.setIsLocateEnable(false)
-                }
-                pageIndicatorView.selection = viewModel.currentItem
-            }
-        })
-        viewPager.offscreenPageLimit = 2
-        viewPager.adapter = WeatherViewPagerAdapter(supportFragmentManager, viewModel.fragments)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
                 Log.d("StateChanged", "state:${state}")
@@ -77,7 +48,7 @@ class WeatherActivity : AppCompatActivity() {
                     val currentIndex = viewPager.currentItem
                     val position = viewModel.fragments[currentIndex].getCurrentPosition()
                     viewModel.currentPosition = position
-                    /**把当前fragment的前一个后一个fragment滚动到相同位置*/
+                    //把当前fragment的前一个后一个fragment滚动到相同位置
                     if (currentIndex > 0) {
                         viewModel.fragments[currentIndex - 1].scrollTo(position)
                     }
@@ -95,27 +66,35 @@ class WeatherActivity : AppCompatActivity() {
                 var alpha: Float
                 alpha = if (position == viewPager.currentItem) {
                     viewModel.clapBoardAlpha + positionOffset
-                    /**划向下一页*/
+                    //划向下一页
                 } else {
-                    /**划向上一页*/
+                    //划向上一页
                     viewModel.clapBoardAlpha + 1 - positionOffset
                 }
                 if (alpha > 1) alpha = 1f
-                Log.d(TAG, "alpha${alpha}  viewModel.clapBoardAlpha${viewModel.clapBoardAlpha}")
+                Log.d(
+                    TAG,
+                    "alpha${alpha}  viewModel.clapBoardAlpha${viewModel.clapBoardAlpha}"
+                )
                 clapBoard.alpha = alpha
             }
 
             override fun onPageSelected(position: Int) {
-                viewModel.currentItem = position
+                //viewModel.currentItem = position
                 val fragment = viewModel.fragments[position]
-                //clapBoard.alpha = 0f
-                locationText.text = viewModel.locations[position].name
+                val locations = viewModel.locations.value!!
+                clapBoard.alpha = 0f
+                if (locations[0].isLocateEnable) {
+                    locationText.text = locations[position].name
+                } else {
+                    locationText.text = locations[position + 1].name
+                }
                 titleBarTempText.text = fragment.getCurrentTemp()
                 videoView.pause()
                 fragment.getSkyCon()?.let { skyCon ->
                     videoView.setVideoURI(
                         Uri.parse(
-                            "android.resource://${packageName}/${WeatherUtil.getVideoNameBySkyCon(
+                            "android.resource://${packageName}/${getVideoNameBySkyCon(
                                 skyCon
                             )}"
                         )
@@ -124,11 +103,46 @@ class WeatherActivity : AppCompatActivity() {
                 }
             }
         })
+        viewPager.adapter = WeatherViewPagerAdapter(supportFragmentManager, viewModel.fragments)
     }
+
+    private fun initToolbar() {
+        managerLocationBtn.setOnClickListener {
+            startActivity<ManagerLocationActivity>()
+        }
+    }
+
+
+    private fun refreshViewPager(locations: MutableList<LocationItemBean>) {
+        if (locations.size == 0 || (locations.size == 1 && !locations[0].isLocateEnable)) {
+            startActivity<ManagerLocationActivity>()
+        } else {
+            viewModel.fragments.clear()
+            for (location in locations) {
+                if (!location.isLocate || (location.isLocate && location.isLocateEnable)) {
+                    val fragment = WeatherFragment.newInstance(location)
+                    viewModel.fragments.add(fragment)
+                }
+            }
+            viewPager.adapter?.notifyDataSetChanged()
+            if (locations[0].isLocateEnable) {
+                locationText.text = locations[viewPager.currentItem].name
+                pageIndicatorView.setIsLocateEnable(true)
+            } else {
+                if (viewPager.currentItem == 0) {
+                    locationText.text = locations[1].name
+                } else {
+                    locationText.text = locations[viewPager.currentItem].name
+                }
+                pageIndicatorView.setIsLocateEnable(false)
+            }
+
+        }
+    }
+
 
     /**为了防止VideoView播放前显示黑色背景 需要在xml设置videoView背景为非透明色*/
     private fun initVideoView() {
-
         videoView.setOnCompletionListener {
             videoView.start()
         }
@@ -136,6 +150,7 @@ class WeatherActivity : AppCompatActivity() {
             mp?.setOnInfoListener { _, what, _ ->
                 if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                     videoView.setBackgroundColor(Color.TRANSPARENT)
+                    Log.d("stop", "stop")
                 }
                 true
             }
@@ -145,20 +160,23 @@ class WeatherActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.refreshLocations()
     }
 
     override fun onPause() {
         super.onPause()
+    }
+
+    override fun onStart() {
+        super.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
         if (videoView.isPlaying) {
             videoView.pause()
         }
         videoView.setBackgroundColor(Color.WHITE)
-        if (viewModel.locations.size > 0)
-            viewModel.currentPosition =
-                viewModel.fragments[viewPager.currentItem].getCurrentPosition()
     }
-
     override fun onDestroy() {
         super.onDestroy()
         videoView.stopPlayback()
@@ -168,10 +186,4 @@ class WeatherActivity : AppCompatActivity() {
         return viewModel.fragments[viewPager.currentItem] == fragment
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
-            viewModel.currentItem = data?.getIntExtra("position", 0) ?: 0
-        }
-    }
 }

@@ -32,12 +32,14 @@ class DefaultLocationAdapter(
                 location.isSelected = false
                 holder.name.textColor = Color.BLACK
                 holder.name.setBackgroundResource(R.drawable.shape_default_location)
-                activity.viewModel.deleteLocation(location.name)
+                //从数据库删除
+                activity.viewModel.deleteLocation(location)
 
             } else {
                 location.isSelected = true
                 holder.name.textColor = Color.WHITE
                 holder.name.setBackgroundResource(R.drawable.shape_default_location_selected)
+                //添加地址
                 activity.viewModel.addLocation(location)
                 activity.viewModel.getLocationWeatherInfo(location)
             }

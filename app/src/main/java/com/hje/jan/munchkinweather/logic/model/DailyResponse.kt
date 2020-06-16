@@ -3,7 +3,9 @@ package com.hje.jan.munchkinweather.logic.model
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
-
+/**
+ * 未来几天的天气信息
+ * */
 @Parcelize
 data class DailyResponse(
     val result: Result,
