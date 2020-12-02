@@ -16,7 +16,7 @@ class MunchkinWeatherApplication : Application() {
         /**彩云天气令牌*/
         const val TOKEN = "9BZyqvUN3hKyVYuz"
     }
-
+    
     override fun onCreate() {
         super.onCreate()
         context = applicationContext

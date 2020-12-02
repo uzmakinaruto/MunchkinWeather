@@ -33,7 +33,6 @@ import kotlinx.android.synthetic.main.section_weather_forecast.*
 import kotlinx.android.synthetic.main.titlebar_weather.*
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.support.v4.toast
 import org.jetbrains.anko.textColorResource
 import java.util.*
 
@@ -112,6 +111,8 @@ class WeatherFragment : Fragment() {
         Log.d(TAG, "onDetach-${viewModel.location.name}")
     }
 
+
+
     private fun scrollHandler(scrollY: Int) {
         if (weatherActivity.isCurrentFragment(this)) {
             /**activity上的UI变化 只有此fragment为当前fragment时才更新*/
@@ -145,20 +146,20 @@ class WeatherFragment : Fragment() {
             scrollHandler(scrollY)
         }
         viewModel.isRefresh.observe(viewLifecycleOwner, Observer { it ->
-            refreshLayout.finishRefresh()
             val results = it.getOrNull()
             if (results != null) {
                 for ((index, fragment) in weatherActivity.viewModel.fragments.withIndex()) {
                     if (fragment.isVisible) {
                         if (results[index]) {
                             fragment.refreshWeatherUI()
+                            refreshLayout.finishRefresh(true)
                         } else {
-                            toast("${fragment.viewModel.location.name}获取天气失败")
+                            refreshLayout.finishRefresh(false)
                         }
                     }
                 }
             } else {
-                toast("获取失败")
+                refreshLayout.finishRefresh(false)
             }
         })
 
